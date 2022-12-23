@@ -15,9 +15,9 @@ public class TransformConstrainer : MonoBehaviour
     }
 
     [SerializeField]
-    private bool _isActive;
+    private bool isActive;
     [SerializeField]
-    private GameObject _constraintSource;
+    private GameObject constraintSource;
 
     [SerializeField]
     private AxisContraints _XAxisRotation = new AxisContraints();
@@ -25,6 +25,14 @@ public class TransformConstrainer : MonoBehaviour
     private AxisContraints _YAxisRotation = new AxisContraints();
     [SerializeField]
     private AxisContraints _ZAxisRotation = new AxisContraints();
+
+    #region AxisContraintProperties
+    
+        public AxisContraints XAxisRotation => _XAxisRotation;
+        public AxisContraints YAxisRotation => _YAxisRotation;
+        public AxisContraints ZAxisRotation => _ZAxisRotation;
+
+    #endregion
 
     void Start()
     {
@@ -34,7 +42,7 @@ public class TransformConstrainer : MonoBehaviour
 
     void Update()
     {
-        if (_isActive)
+        if (isActive)
             UpdateRotation();
     }
     
@@ -46,7 +54,7 @@ public class TransformConstrainer : MonoBehaviour
     
     void UpdateRotation()
     {
-        transform.localEulerAngles = LockedRotation(_constraintSource.transform.localEulerAngles);
+        transform.localEulerAngles = LockedRotation(constraintSource.transform.localEulerAngles);
     }
 
     Vector3 LockedRotation(Vector3 sourceRotation)
@@ -70,6 +78,5 @@ public class TransformConstrainer : MonoBehaviour
         
         return new Vector3(rotationX, rotationY, rotationZ);
     }
-
     
 }

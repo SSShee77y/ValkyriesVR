@@ -8,7 +8,7 @@ public class EventToggler : MonoBehaviour
     [SerializeField]
     private UnityEvent _whenToggledOff;
 
-    #region Properties
+    #region EventProperties
 
         public UnityEvent WhenToggledOn => _whenToggledOn;
         public UnityEvent WhenToggledOff => _whenToggledOff;
