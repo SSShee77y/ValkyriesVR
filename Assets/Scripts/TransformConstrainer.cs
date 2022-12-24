@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class TransformConstrainer : MonoBehaviour
 {
-    private Vector3 defaultPosition;
-    private Vector3 defaultRotation;
+    private Vector3 _defaultPosition;
+    private Vector3 _defaultRotation;
     
     [Serializable]
     public class AxisContraints
@@ -15,9 +15,9 @@ public class TransformConstrainer : MonoBehaviour
     }
 
     [SerializeField]
-    private bool isActive;
+    private bool _isActive;
     [SerializeField]
-    private GameObject constraintSource;
+    private GameObject _constraintSource;
 
     [SerializeField]
     private AxisContraints _XAxisRotation = new AxisContraints();
@@ -36,25 +36,20 @@ public class TransformConstrainer : MonoBehaviour
 
     void Start()
     {
-        defaultPosition = gameObject.transform.localPosition;
-        defaultRotation = gameObject.transform.localEulerAngles;
+        _defaultPosition = gameObject.transform.localPosition;
+        _defaultRotation = gameObject.transform.localEulerAngles;
     }
 
     void Update()
     {
-        if (isActive)
-            UpdateRotation();
+        if (_isActive)
+            transform.localEulerAngles = LockedRotation(_constraintSource.transform.localEulerAngles);
     }
     
     public void InvokeReset()
     {
-        gameObject.transform.localPosition = defaultPosition;
-        gameObject.transform.localEulerAngles = defaultRotation;
-    }
-    
-    void UpdateRotation()
-    {
-        transform.localEulerAngles = LockedRotation(constraintSource.transform.localEulerAngles);
+        gameObject.transform.localPosition = _defaultPosition;
+        gameObject.transform.localEulerAngles = _defaultRotation;
     }
 
     Vector3 LockedRotation(Vector3 sourceRotation)

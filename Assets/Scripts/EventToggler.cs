@@ -29,7 +29,8 @@ public class EventToggler : MonoBehaviour
         onToggle = !onToggle;
     }
 
-    public void InvokeToggle() {
+    public void InvokeToggle()
+    {
         if(togglerCooldown == MAX_COOLDOWN)
         {
             SwitchToggle();
