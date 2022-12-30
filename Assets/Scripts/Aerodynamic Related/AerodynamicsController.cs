@@ -9,9 +9,11 @@ public class AerodynamicsController : MonoBehaviour
     public class ControlSurface
     {
         public Transform transform;
-        public float PitchFactor;
-        public float RollFactor;
-        public float YawFactor;
+        
+        public float PitchFactor; // Vector.Right
+        public float RollFactor; // Vector.Foward
+        public float YawFactor; // Vector.Up
+
         public float FlapsFactor;
         public float BreakFactor;
     }
@@ -33,6 +35,11 @@ public class AerodynamicsController : MonoBehaviour
     }
 
     void Update()
+    {
+        
+    }
+
+    public void ApplySurfaceTorques()
     {
         
     }
