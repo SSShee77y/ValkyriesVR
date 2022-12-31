@@ -115,9 +115,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
   m_Name: BAHNSCHRIFT SDF 1
   m_EditorClassIdentifier: 
-  hashCode: 432829861
+  hashCode: -1094682828
   material: {fileID: -7121980797146337571}
-  materialHashCode: 1574934885
+  materialHashCode: -494481516
   m_Version: 1.1.0
   m_SourceFontFileGUID: 089c9553bf9ba47418e7979fdf86f60a
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: 089c9553bf9ba47418e7979fdf86f60a, type: 3}
