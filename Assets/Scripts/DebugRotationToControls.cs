@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RotationToControls : MonoBehaviour
+public class DebugRotationToControls : MonoBehaviour
 {
     private Vector3 _defaultRotation;
 

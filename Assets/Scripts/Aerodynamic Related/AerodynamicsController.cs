@@ -9,23 +9,27 @@ public class AerodynamicsController : MonoBehaviour
     public class ControlSurface
     {
         public Transform transform;
+        public enum SurfaceType
+        {
+            LeftAileron,
+            RightAileron,
+            Elevator,
+            Stabilizer,
+            Flaps,
+            Break
+        }
+        public SurfaceType surfaceType;
         
         public float PitchFactor; // Vector.Right
         public float RollFactor; // Vector.Foward
         public float YawFactor; // Vector.Up
-
-        public float FlapsFactor;
+        
+        public float FlapFactor;
         public float BreakFactor;
     }
 
     [SerializeField]
-    public List<ControlSurface> controlSurfaces = new List<ControlSurface>();
-    
-    public float PitchSpeed;
-    public float RollSpeed;
-    public float YawSpeed;
-    public float FlapsSpeed;
-    public float BreakSpeed;
+    private List<ControlSurface> controlSurfaces = new List<ControlSurface>();
 
     private Rigidbody _rb;
 
@@ -34,13 +38,43 @@ public class AerodynamicsController : MonoBehaviour
         _rb = gameObject.GetComponent<Rigidbody>();
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        
+        ApplySurfaceTorques();
     }
 
     public void ApplySurfaceTorques()
     {
-        
+        // Drag Coefficient Formula
+        float dragCoefficient = 1.63f;
+        if (_rb.velocity.magnitude <= 237)
+        {
+            dragCoefficient = (float) (0.9940 + 0.000005 * Mathf.Pow((_rb.velocity.magnitude - 237), 2));
+        }
+        else if (_rb.velocity.magnitude >= 408)
+        {
+            dragCoefficient = (float) (2.2674 - 0.0000025 * Mathf.Pow((_rb.velocity.magnitude - 408), 2));
+        }
+        else
+        {
+            dragCoefficient = (float) (1.63 + .54 * Mathf.Pow((_rb.velocity.magnitude - 320), 1/27));
+        }    
+
+        foreach (ControlSurface controlSurface in controlSurfaces)
+        {
+            _rb.AddForceAtPosition(controlSurface.transform.up * -VelAngleDiffMultiplier(controlSurface.transform.up) * controlSurface.PitchFactor
+                    * Mathf.Pow(_rb.velocity.magnitude, 2) / 2 * dragCoefficient, controlSurface.transform.position);
+            _rb.AddForceAtPosition(controlSurface.transform.right * -VelAngleDiffMultiplier(controlSurface.transform.right) * controlSurface.RollFactor
+                    * Mathf.Pow(_rb.velocity.magnitude, 2) / 2 * dragCoefficient, controlSurface.transform.position);
+            _rb.AddForceAtPosition(controlSurface.transform.forward * -VelAngleDiffMultiplier(controlSurface.transform.forward) * controlSurface.YawFactor
+                    * Mathf.Pow(_rb.velocity.magnitude, 2) / 2 * dragCoefficient, controlSurface.transform.position);
+        }
+    }
+
+    float VelAngleDiffMultiplier(Vector3 transformDirection)
+    {
+        float angleDifference = Vector3.Angle(transformDirection, Vector3.Normalize(_rb.velocity));
+        float multiplier = Mathf.Cos(angleDifference * Mathf.Deg2Rad);
+        return multiplier;
     }
 }

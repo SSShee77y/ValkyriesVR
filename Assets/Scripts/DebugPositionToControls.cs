@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PositionToControls : MonoBehaviour
+public class DebugPositionToControls : MonoBehaviour
 {
     private Vector3 _defaultPosition;
 

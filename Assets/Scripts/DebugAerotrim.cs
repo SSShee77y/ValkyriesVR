@@ -32,7 +32,7 @@ public class DebugAerotrim : MonoBehaviour
         _rb = gameObject.GetComponent<Rigidbody>();
     }
     
-    void Update()
+    void FixedUpdate()
     {
         ApplySurfaceTorques();
     }
