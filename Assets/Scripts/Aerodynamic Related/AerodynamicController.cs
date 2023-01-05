@@ -16,16 +16,11 @@ public class AerodynamicController : MonoBehaviour
             Elevator,
             Stabilizer,
             Flaps,
-            Break
+            Brake
         }
         public SurfaceType surfaceType;
         
-        public float PitchFactor; // Vector.Right
-        public float RollFactor; // Vector.Foward
-        public float YawFactor; // Vector.Up
-        
-        public float FlapFactor;
-        public float BreakFactor;
+        public float Factor;
     }
     [SerializeField]
     private float _startingSpeed;
@@ -39,14 +34,22 @@ public class AerodynamicController : MonoBehaviour
     private float _thrustFactor = 40f;
     [SerializeField]
     private float _currentEngineSpeed;
+    public float CurrentEngineSpeed => _currentEngineSpeed;
     [SerializeField]
     private float _engineIncreaseSpeed = 0.5f;
     [SerializeField]
     private float _dragFactor = 1f;
     [SerializeField]
+    private float _maxFacingArea = 250f;
+    [SerializeField]
+    private float _fowardAreaFactor = 0.0019f;
+    [SerializeField]
     private float _stallSpeed = 60f;
     [SerializeField]
     private float _stallFactor = 2f;
+
+    [SerializeField]
+    private bool _engineTest = false;
 
     [SerializeField]
     private List<ControlSurface> _controlSurfaces = new List<ControlSurface>();
@@ -74,7 +77,7 @@ public class AerodynamicController : MonoBehaviour
     void ApplyThrust()
     {
         float enginePercentage = 100;
-        if (_throttleControl != null)
+        if (_engineTest == false && _throttleControl != null)
             enginePercentage = (_throttleControl.transform.localPosition.z - _minimumThrottleDisplacement) / _maximumThrottleDisplacement * 100;
 
         if (_currentEngineSpeed >= enginePercentage - _engineIncreaseSpeed/2 && enginePercentage <= enginePercentage + _engineIncreaseSpeed/2)
@@ -109,7 +112,7 @@ public class AerodynamicController : MonoBehaviour
 
     void ApplyDragLift()
     {
-        float airDensity = 1.3f;
+        float airDensity = Mathf.Pow(1.1068f, 2f - 0.788f * Mathf.Pow(transform.position.y / 1000f, 1.15f)); // Close approximation
         
         // Drag Coefficient Formula
         float dragCoefficient = 1.63f;
@@ -126,18 +129,20 @@ public class AerodynamicController : MonoBehaviour
             dragCoefficient = (float) (1.63 + .54 * Mathf.Pow((_rb.velocity.magnitude - 320), 1/27));
         }
 
+        // Set Angular Drag
+        _rb.angularDrag = 1 + dragCoefficient * airDensity * Mathf.Pow(_rb.velocity.magnitude, 2) / 40000;
+
         // Drag Math
-        float facingArea = 100f;
-        float dragAmount = -1 * Mathf.Pow(_rb.velocity.magnitude, 2) / 2 * airDensity * facingArea * dragCoefficient * _dragFactor;
+        float dragAmount = -1 * Mathf.Pow(_rb.velocity.magnitude, 2) / 2 * airDensity * _maxFacingArea * dragCoefficient * _dragFactor;
         float dragUp = VelAngleDiffMultiplier(transform.up, 1.0f, 1.0f) * dragAmount;
-        float dragFoward = VelAngleDiffMultiplier(transform.forward, 0.0047f, 2) * dragAmount;
+        float dragFoward = VelAngleDiffMultiplier(transform.forward, _fowardAreaFactor, 2) * dragAmount;
         float dragRight = VelAngleDiffMultiplier(transform.right, 0.96f, 0.96f) * dragAmount;
 
         // Force Applications
         _rb.AddRelativeForce(Vector3.up * dragUp);
         _rb.AddRelativeForce(Vector3.forward * dragFoward);
         _rb.AddRelativeForce(Vector3.right * dragRight);
-        ApplySurfaceTorques(dragAmount / facingArea);
+        ApplySurfaceTorques(dragAmount / _maxFacingArea);
     }
 
     float GetAngleOfAttack()
@@ -166,46 +171,61 @@ public class AerodynamicController : MonoBehaviour
         {
             if (controlSurface.surfaceType == ControlSurface.SurfaceType.LeftAileron)
             {
-                float torqueAmount = -1f * VelAngleDiffMultiplier(controlSurface.transform.up) * dragAmount * controlSurface.RollFactor;
+                float torqueAmount = -1f * VelAngleDiffMultiplier(controlSurface.transform.up) * dragAmount * controlSurface.Factor;
                 _rb.AddRelativeTorque(Vector3.back * torqueAmount);
                 float forceAmount = Mathf.Cos(Vector3.Angle(controlSurface.transform.up, transform.forward * -1f) * Mathf.Deg2Rad) * torqueAmount;
-                _rb.AddRelativeForce(Vector3.forward * forceAmount);
+                _rb.AddRelativeForce(Vector3.forward * forceAmount / 2);
             }
 
             else if (controlSurface.surfaceType == ControlSurface.SurfaceType.RightAileron)
             {
-                float torqueAmount = -1f * VelAngleDiffMultiplier(controlSurface.transform.up) * dragAmount * controlSurface.RollFactor;
+                float torqueAmount = -1f * VelAngleDiffMultiplier(controlSurface.transform.up) * dragAmount * controlSurface.Factor;
                 _rb.AddRelativeTorque(Vector3.forward * torqueAmount);
                 float forceAmount = Mathf.Cos(Vector3.Angle(controlSurface.transform.up, transform.forward * -1f) * Mathf.Deg2Rad) * torqueAmount;
-                _rb.AddRelativeForce(Vector3.forward * forceAmount);
+                _rb.AddRelativeForce(Vector3.forward * forceAmount / 2);
             }
 
             else if (controlSurface.surfaceType == ControlSurface.SurfaceType.Elevator)
             {
-                float torqueAmount = -1f * VelAngleDiffMultiplier(controlSurface.transform.up) * dragAmount * controlSurface.PitchFactor;
+                float torqueAmount = -1f * VelAngleDiffMultiplier(controlSurface.transform.up) * dragAmount * controlSurface.Factor;
                 _rb.AddRelativeTorque(Vector3.left * torqueAmount);
                 float forceAmount = Mathf.Cos(Vector3.Angle(controlSurface.transform.up, transform.forward * -1f) * Mathf.Deg2Rad) * torqueAmount;
-                _rb.AddRelativeForce(Vector3.forward * forceAmount);
+                _rb.AddRelativeForce(Vector3.forward * forceAmount / 2);
 
                 // Apply fake lift torque
-                float liftTorqueAmount = VelAngleDiffMultiplier(transform.up) * dragAmount * controlSurface.PitchFactor;
+                float liftTorqueAmount = VelAngleDiffMultiplier(transform.up) * dragAmount * controlSurface.Factor;
                 if (GetAngleOfAttack() >= Mathf.Abs(2.5f) && _rb.velocity.magnitude <= _stallSpeed) // If at stall speed
                 {
                     float multiplier = _stallFactor * Mathf.Cos(.5f * (Vector3.Angle(transform.forward, Vector3.Normalize(_rb.velocity)) - 2.5f) * Mathf.Deg2Rad);
-                    liftTorqueAmount = multiplier * dragAmount * controlSurface.PitchFactor * Mathf.Min(100f, Mathf.Pow(_stallSpeed / _rb.velocity.magnitude, 2));
+                    liftTorqueAmount = multiplier * dragAmount * controlSurface.Factor * Mathf.Min(100f, Mathf.Pow(_stallSpeed / _rb.velocity.magnitude, 2));
                     liftTorqueAmount *= VelAngleDiffMultiplier(transform.up) <= VelAngleDiffMultiplier(transform.up * -1f) ? 1f: -1f;
                 }
                 _rb.AddRelativeTorque(Vector3.left * liftTorqueAmount);
                 
-            }//*/
+            }
 
             else if (controlSurface.surfaceType == ControlSurface.SurfaceType.Stabilizer)
             {
-                float torqueAmount = VelAngleDiffMultiplier(controlSurface.transform.right) * dragAmount * controlSurface.YawFactor;
+                float torqueAmount = VelAngleDiffMultiplier(controlSurface.transform.right) * dragAmount * controlSurface.Factor;
                 _rb.AddRelativeTorque(Vector3.down * torqueAmount);
                 float forceAmount = Mathf.Abs(Mathf.Cos(Vector3.Angle(controlSurface.transform.right, transform.forward)) * Mathf.Deg2Rad) * torqueAmount;
-                _rb.AddRelativeForce(Vector3.back * forceAmount);
-            }//*/
+                _rb.AddRelativeForce(Vector3.back * forceAmount / 2);
+            }
+
+            else if (controlSurface.surfaceType == ControlSurface.SurfaceType.Flaps)
+            {
+                if (controlSurface.transform.localEulerAngles.x != 0) {
+                    float torqueAmount = VelAngleDiffMultiplier(controlSurface.transform.up) * dragAmount * controlSurface.Factor;
+                    _rb.AddRelativeForce(controlSurface.transform.up * torqueAmount);
+                }
+            }
+
+            else if (controlSurface.surfaceType == ControlSurface.SurfaceType.Brake)
+            {
+                float torqueAmount = -1f * VelAngleDiffMultiplier(controlSurface.transform.up) * dragAmount * controlSurface.Factor;
+                float forceAmount = Mathf.Cos(Vector3.Angle(controlSurface.transform.up, transform.forward * -1f) * Mathf.Deg2Rad) * torqueAmount;
+                _rb.AddRelativeForce(Vector3.forward * forceAmount);
+            }
         }
     }
 }
