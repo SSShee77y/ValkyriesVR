@@ -33,19 +33,11 @@ public class PositionLockConstrainer : MonoBehaviour
     private GameObject _constraintSource;
 
     [SerializeField]
-    private AxisContraints _XPosition = new AxisContraints();
+    public AxisContraints XPosition = new AxisContraints();
     [SerializeField]
-    private AxisContraints _YPosition = new AxisContraints();
+    public AxisContraints YPosition = new AxisContraints();
     [SerializeField]
-    private AxisContraints _ZPosition = new AxisContraints();
-
-    #region AxisContraintProperties
-    
-        public AxisContraints XPosition => _XPosition;
-        public AxisContraints YPosition => _YPosition;
-        public AxisContraints ZPosition => _ZPosition;
-
-    #endregion
+    public AxisContraints ZPosition = new AxisContraints();
 
     private Vector3 _targetPosition;
 
@@ -88,21 +80,21 @@ public class PositionLockConstrainer : MonoBehaviour
         float posY = sourcePosition.y;
         float posZ = sourcePosition.z;
         
-        posX *= _XPosition.Inverse ? -1: 1;
-        posY *= _YPosition.Inverse ? -1: 1;
-        posZ *= _ZPosition.Inverse ? -1: 1;
+        posX *= XPosition.Inverse ? -1: 1;
+        posY *= YPosition.Inverse ? -1: 1;
+        posZ *= ZPosition.Inverse ? -1: 1;
 
-        if (_XPosition.Constrain)
+        if (XPosition.Constrain)
         {
-            posX = Mathf.Clamp(posZ, _XPosition.MinDisplacment, _XPosition.MaxDisplacment);
+            posX = Mathf.Clamp(posZ, XPosition.MinDisplacment, XPosition.MaxDisplacment);
         }
-        if (_YPosition.Constrain)
+        if (YPosition.Constrain)
         {
-            posY = Mathf.Clamp(posY, _YPosition.MinDisplacment, _YPosition.MaxDisplacment);
+            posY = Mathf.Clamp(posY, YPosition.MinDisplacment, YPosition.MaxDisplacment);
         }
-        if (_ZPosition.Constrain)
+        if (ZPosition.Constrain)
         {
-            posZ = Mathf.Clamp(posZ, _ZPosition.MinDisplacment, _ZPosition.MaxDisplacment);
+            posZ = Mathf.Clamp(posZ, ZPosition.MinDisplacment, ZPosition.MaxDisplacment);
         }
         
         return new Vector3(posX, posY, posZ);
@@ -119,9 +111,9 @@ public class PositionLockConstrainer : MonoBehaviour
         float posY = transform.localPosition.y;
         float posZ = transform.localPosition.z;
 
-        List<float> xLockPoints = _XPosition.lockPoints;
-        List<float> yLockPoints = _YPosition.lockPoints;
-        List<float> zLockPoints = _ZPosition.lockPoints;
+        List<float> xLockPoints = XPosition.lockPoints;
+        List<float> yLockPoints = YPosition.lockPoints;
+        List<float> zLockPoints = ZPosition.lockPoints;
 
         posX = CalculateClosestPoint(xLockPoints, posX);
         posY = CalculateClosestPoint(yLockPoints, posY);

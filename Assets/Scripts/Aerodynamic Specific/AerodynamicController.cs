@@ -196,6 +196,10 @@ public class AerodynamicController : MonoBehaviour
                 float liftTorqueAmount = VelAngleDiffMultiplier(transform.up) * dragAmount * controlSurface.Factor;
                 if (GetAngleOfAttack() >= Mathf.Abs(2.5f) && _rb.velocity.magnitude <= _stallSpeed) // If at stall speed
                 {
+                    /*
+                     * TO-DO
+                     * Maybe make stall faster depending on AoA
+                     */
                     float multiplier = _stallFactor * Mathf.Cos(.5f * (Vector3.Angle(transform.forward, Vector3.Normalize(_rb.velocity)) - 2.5f) * Mathf.Deg2Rad);
                     liftTorqueAmount = multiplier * dragAmount * controlSurface.Factor * Mathf.Min(100f, Mathf.Pow(_stallSpeed / _rb.velocity.magnitude, 2));
                     liftTorqueAmount *= VelAngleDiffMultiplier(transform.up) <= VelAngleDiffMultiplier(transform.up * -1f) ? 1f: -1f;

@@ -22,4 +22,15 @@ public class WheelController : MonoBehaviour
             }
         }
     }
+
+    public bool AnyWheelIsColldingWithGround()
+    {
+        foreach (WheelCollider w in GetComponentsInChildren<WheelCollider>()) {
+            if (w.isGrounded)            
+            {
+                return true;
+            }
+        }
+        return false;
+    } 
 }
