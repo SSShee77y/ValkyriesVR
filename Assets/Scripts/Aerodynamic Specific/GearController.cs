@@ -25,6 +25,9 @@ public class GearController : MonoBehaviour
     }
 
     [SerializeField]
+    private Rigidbody _planeRigidbody;
+
+    [SerializeField]
     private WheelController _referenceWheelController;
 
     private bool wheelsGrounded;
@@ -41,6 +44,7 @@ public class GearController : MonoBehaviour
     private GearEvent _gearEvent;
 
     private PositionLockConstrainer _plc;
+    private bool invokedEventOne = false;
 
     void Start()
     {
@@ -64,8 +68,8 @@ public class GearController : MonoBehaviour
 
     void ModifyConstrainer()
     {
-        if (wheelsGrounded) _plc.ZPosition.MaxDisplacment = -0.02f;
-        else _plc.ZPosition.MaxDisplacment = 0.18f;
+        if (wheelsGrounded) _plc.ZPosition.MaxDisplacment = -0.004f;
+        else _plc.ZPosition.MaxDisplacment = 0.018f;
     }
 
     void CheckPositions()
@@ -84,8 +88,21 @@ public class GearController : MonoBehaviour
         }
 
         if (transform.localPosition.Equals(_firstPosition))
-            _gearEvent.eventOne.Invoke();
+            if (invokedEventOne == false)
+            {
+                Vector3 velocity = _planeRigidbody.velocity;
+                Vector3 angularVelocity = _planeRigidbody.angularVelocity;
+                _gearEvent.eventOne.Invoke();
+                invokedEventOne = true;
+                _planeRigidbody.velocity = velocity;
+                _planeRigidbody.angularVelocity = angularVelocity;
+
+            }
         else if (transform.localPosition.Equals(_secondPosition))
-            _gearEvent.eventTwo.Invoke();
+            if (invokedEventOne == true)
+            {
+                _gearEvent.eventTwo.Invoke();
+                invokedEventOne = false;
+            }
     }
 }

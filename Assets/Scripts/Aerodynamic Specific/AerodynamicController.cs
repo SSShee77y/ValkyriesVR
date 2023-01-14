@@ -44,6 +44,10 @@ public class AerodynamicController : MonoBehaviour
     [SerializeField]
     private float _fowardAreaFactor = 0.0019f;
     [SerializeField]
+    private float _upAreaFactor = 1.0f;
+    [SerializeField]
+    private float _rightAreaFactor = 0.9f;
+    [SerializeField]
     private float _stallSpeed = 60f;
     [SerializeField]
     private float _stallFactor = 2f;
@@ -79,8 +83,10 @@ public class AerodynamicController : MonoBehaviour
         float enginePercentage = 100;
         if (_engineTest == false && _throttleControl != null)
             enginePercentage = (_throttleControl.transform.localPosition.z - _minimumThrottleDisplacement) / _maximumThrottleDisplacement * 100;
+        if (enginePercentage <= 0)
+            enginePercentage = 0;
 
-        if (_currentEngineSpeed >= enginePercentage - _engineIncreaseSpeed/2 && enginePercentage <= enginePercentage + _engineIncreaseSpeed/2)
+        if (_currentEngineSpeed >= enginePercentage - _engineIncreaseSpeed/2 && _currentEngineSpeed <= enginePercentage + _engineIncreaseSpeed/2)
             _currentEngineSpeed = enginePercentage;
         else if (_currentEngineSpeed > enginePercentage)
             _currentEngineSpeed -= _engineIncreaseSpeed;
@@ -134,9 +140,9 @@ public class AerodynamicController : MonoBehaviour
 
         // Drag Math
         float dragAmount = -1 * Mathf.Pow(_rb.velocity.magnitude, 2) / 2 * airDensity * _maxFacingArea * dragCoefficient * _dragFactor;
-        float dragUp = VelAngleDiffMultiplier(transform.up, 1.0f, 1.0f) * dragAmount;
+        float dragUp = VelAngleDiffMultiplier(transform.up, _upAreaFactor, _upAreaFactor) * dragAmount;
         float dragFoward = VelAngleDiffMultiplier(transform.forward, _fowardAreaFactor, 2) * dragAmount;
-        float dragRight = VelAngleDiffMultiplier(transform.right, 0.96f, 0.96f) * dragAmount;
+        float dragRight = VelAngleDiffMultiplier(transform.right, _rightAreaFactor, _rightAreaFactor) * dragAmount;
 
         // Force Applications
         _rb.AddRelativeForce(Vector3.up * dragUp);
@@ -148,7 +154,7 @@ public class AerodynamicController : MonoBehaviour
     float GetAngleOfAttack()
     {
         float angleOfAttack = Vector3.Angle(transform.forward, Vector3.Normalize(_rb.velocity));
-        angleOfAttack *= (transform.forward.y < Vector3.Normalize(_rb.velocity).y) ? -1f: 1f;
+        //angleOfAttack *= (transform.forward.y < Vector3.Normalize(_rb.velocity).y) ? -1f: 1f;
         return angleOfAttack;
     }
 

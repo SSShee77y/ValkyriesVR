@@ -5,18 +5,23 @@ using UnityEngine;
 public class PlaneAudioHandler : AudioManager
 {
     private AerodynamicController _ac;
+    private Rigidbody _rb;
 
     void Start()
     {
         _ac = gameObject.GetComponent<AerodynamicController>();
+        _rb = gameObject.GetComponent<Rigidbody>();
     }
 
     void Update()
     {
+        Play("Wind");
+        SetVolume("Wind", _rb.velocity.magnitude / 100f);
+
         if (_ac.CurrentEngineSpeed > 1)
         {
             Play("Jet Engine");
-            SetVolume("Jet Engine", Mathf.Sqrt(_ac.CurrentEngineSpeed - 1) / 400f);
+            SetVolume("Jet Engine", Mathf.Sqrt(_ac.CurrentEngineSpeed - 1) / 10f);
         }
         else
         {
@@ -25,8 +30,8 @@ public class PlaneAudioHandler : AudioManager
 
         if (_ac.CurrentEngineSpeed > 110)
         {
-            //Play("Afterburner");
-            SetVolume("Afterburner", Mathf.Sqrt((_ac.CurrentEngineSpeed - 100) * 5) / 400f);
+            Play("Afterburner");
+            SetVolume("Afterburner", Mathf.Sqrt((_ac.CurrentEngineSpeed - 100) * 6) / 10f);
         }
         else
         {
