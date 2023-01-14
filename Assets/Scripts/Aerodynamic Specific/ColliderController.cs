@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WheelController : MonoBehaviour
+public class ColliderController : MonoBehaviour
 {
     private AerodynamicController _ac;
 
@@ -10,9 +10,15 @@ public class WheelController : MonoBehaviour
     {
         _ac = gameObject.GetComponent<AerodynamicController>();
 
-        foreach (Collider c in GetComponentsInChildren<Collider>())
+        foreach (Collider c1 in GetComponentsInChildren<Collider>())
         {
-            Physics.IgnoreCollision(gameObject.GetComponent<Collider>(), c, true);
+            if (gameObject.GetComponent<Collider>() != null)
+                Physics.IgnoreCollision(gameObject.GetComponent<Collider>(), c1, true);
+                
+            foreach (Collider c2 in GetComponentsInChildren<Collider>())
+            {
+                if (c2 != c1) Physics.IgnoreCollision(c2, c1, true);
+            }
         }
     }
 

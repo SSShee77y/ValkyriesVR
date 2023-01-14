@@ -28,7 +28,7 @@ public class GearController : MonoBehaviour
     private Rigidbody _planeRigidbody;
 
     [SerializeField]
-    private WheelController _referenceWheelController;
+    private ColliderController _referenceColliderController;
 
     private bool wheelsGrounded;
 
@@ -63,7 +63,7 @@ public class GearController : MonoBehaviour
 
     void CheckWheels()
     {
-        wheelsGrounded = _referenceWheelController.AnyWheelIsColldingWithGround();
+        wheelsGrounded = _referenceColliderController.AnyWheelIsColldingWithGround();
     }
 
     void ModifyConstrainer()
