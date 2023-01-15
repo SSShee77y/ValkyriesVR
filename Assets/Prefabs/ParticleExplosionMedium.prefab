@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4527228361036179453}
   - component: {fileID: 4527228361036179452}
   m_Layer: 0
-  m_Name: ParticleExplosionBig
+  m_Name: ParticleExplosionMedium
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4942,15 +4942,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5319860812964226161, guid: 8b306fc81a4e48f4aa3e08491ecdbfa4, type: 3}
       propertyPath: InitialModule.startSize.scalar
-      value: 10
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 5319860812964226161, guid: 8b306fc81a4e48f4aa3e08491ecdbfa4, type: 3}
       propertyPath: InitialModule.startSpeed.scalar
-      value: 3
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 5319860812964226161, guid: 8b306fc81a4e48f4aa3e08491ecdbfa4, type: 3}
       propertyPath: InitialModule.startSize.minScalar
-      value: 8
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5319860812964226161, guid: 8b306fc81a4e48f4aa3e08491ecdbfa4, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.size
@@ -4962,15 +4962,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5319860812964226161, guid: 8b306fc81a4e48f4aa3e08491ecdbfa4, type: 3}
       propertyPath: InitialModule.startLifetime.scalar
-      value: 2.5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5319860812964226161, guid: 8b306fc81a4e48f4aa3e08491ecdbfa4, type: 3}
       propertyPath: InitialModule.startSpeed.minScalar
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5319860812964226161, guid: 8b306fc81a4e48f4aa3e08491ecdbfa4, type: 3}
       propertyPath: InitialModule.startLifetime.minScalar
-      value: 1.8
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5319860812964226161, guid: 8b306fc81a4e48f4aa3e08491ecdbfa4, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.data[0].cycleCount

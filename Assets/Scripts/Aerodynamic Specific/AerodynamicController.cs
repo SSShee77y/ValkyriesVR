@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AerodynamicController : MonoBehaviour
+public class AerodynamicController : Aerodynamics
 {
     [Serializable]
     public class ControlSurface
@@ -22,63 +22,31 @@ public class AerodynamicController : MonoBehaviour
         
         public float Factor;
     }
-    [SerializeField]
-    private float _startingSpeed;
-    [SerializeField]
-    private GameObject _throttleControl;
-    [SerializeField]
-    private float _maximumThrottleDisplacement;
-    private float _minimumThrottleDisplacement;
-    
-    [SerializeField]
-    private float _thrustFactor = 40f;
-    [SerializeField]
-    private float _currentEngineSpeed;
-    public float CurrentEngineSpeed => _currentEngineSpeed;
-    [SerializeField]
-    private float _engineIncreaseSpeed = 0.5f;
-    [SerializeField]
-    private float _dragFactor = 1f;
-    [SerializeField]
-    private float _maxFacingArea = 250f;
-    [SerializeField]
-    private float _fowardAreaFactor = 0.0019f;
-    [SerializeField]
-    private float _upAreaFactor = 1.0f;
-    [SerializeField]
-    private float _rightAreaFactor = 0.9f;
+
     [SerializeField]
     private float _stallSpeed = 60f;
     [SerializeField]
     private float _stallFactor = 2f;
 
     [SerializeField]
+    private GameObject _throttleControl;
+    [SerializeField]
+    private float _maximumThrottleDisplacement;
+    private float _minimumThrottleDisplacement;
+    [SerializeField]
     private bool _engineTest = false;
 
     [SerializeField]
     private List<ControlSurface> _controlSurfaces = new List<ControlSurface>();
     public List<ControlSurface> ControlSurfaces => _controlSurfaces;
-    
-    private Rigidbody _rb;
 
-    void Start()
+    protected override void Start()
     {
-        _rb = gameObject.GetComponent<Rigidbody>();
-        float velX = Mathf.Cos(Vector3.Angle(transform.forward, Vector3.right) * Mathf.Deg2Rad) * _startingSpeed;
-        float velY = Mathf.Cos(Vector3.Angle(transform.forward, Vector3.up) * Mathf.Deg2Rad) * _startingSpeed;
-        float velZ = Mathf.Cos(Vector3.Angle(transform.forward, Vector3.forward) * Mathf.Deg2Rad) * _startingSpeed;
-        _rb.velocity = new Vector3(velX, velY, velZ);
-
+        base.Start();
         if (_throttleControl != null) _minimumThrottleDisplacement = _throttleControl.transform.localPosition.z;
     }
 
-    void FixedUpdate()
-    {
-        ApplyThrust();
-        ApplyDragLift();
-    }
-
-    void ApplyThrust()
+    protected override void ApplyThrust()
     {
         float enginePercentage = 100;
         if (_engineTest == false && _throttleControl != null)
@@ -116,59 +84,9 @@ public class AerodynamicController : MonoBehaviour
         return 1700f + 40 * (throttlePercentage - 100);
     }
 
-    void ApplyDragLift()
+    protected override void AdditionalDragMethods(float dragAmount)
     {
-        float airDensity = Mathf.Pow(1.1068f, 2f - 0.788f * Mathf.Pow(transform.position.y / 1000f, 1.15f)); // Close approximation
-        
-        // Drag Coefficient Formula
-        float dragCoefficient = 1.63f;
-        if (_rb.velocity.magnitude <= 237)
-        {
-            dragCoefficient = (float) (0.9940 + 0.000005 * Mathf.Pow((_rb.velocity.magnitude - 237), 2));
-        }
-        else if (_rb.velocity.magnitude >= 408)
-        {
-            dragCoefficient = (float) (2.2674 - 0.0000025 * Mathf.Pow((_rb.velocity.magnitude - 408), 2));
-        }
-        else
-        {
-            dragCoefficient = (float) (1.63 + .54 * Mathf.Pow((_rb.velocity.magnitude - 320), 1/27));
-        }
-
-        // Set Angular Drag
-        _rb.angularDrag = 1 + dragCoefficient * airDensity * Mathf.Pow(_rb.velocity.magnitude, 2) / 40000;
-
-        // Drag Math
-        float dragAmount = -1 * Mathf.Pow(_rb.velocity.magnitude, 2) / 2 * airDensity * _maxFacingArea * dragCoefficient * _dragFactor;
-        float dragUp = VelAngleDiffMultiplier(transform.up, _upAreaFactor, _upAreaFactor) * dragAmount;
-        float dragFoward = VelAngleDiffMultiplier(transform.forward, _fowardAreaFactor, 2) * dragAmount;
-        float dragRight = VelAngleDiffMultiplier(transform.right, _rightAreaFactor, _rightAreaFactor) * dragAmount;
-
-        // Force Applications
-        _rb.AddRelativeForce(Vector3.up * dragUp);
-        _rb.AddRelativeForce(Vector3.forward * dragFoward);
-        _rb.AddRelativeForce(Vector3.right * dragRight);
         ApplySurfaceTorques(dragAmount / _maxFacingArea);
-    }
-
-    float GetAngleOfAttack()
-    {
-        float angleOfAttack = Vector3.Angle(transform.forward, Vector3.Normalize(_rb.velocity));
-        //angleOfAttack *= (transform.forward.y < Vector3.Normalize(_rb.velocity).y) ? -1f: 1f;
-        return angleOfAttack;
-    }
-
-    float VelAngleDiffMultiplier(Vector3 transformDirection)
-    {
-        return VelAngleDiffMultiplier(transformDirection, 1, 1);
-    }
-
-    float VelAngleDiffMultiplier(Vector3 transformDirection, float positiveEffect, float negativeEffect)
-    {
-        float angleDifference = Vector3.Angle(transformDirection, Vector3.Normalize(_rb.velocity));
-        float multiplier = Mathf.Cos(angleDifference * Mathf.Deg2Rad);
-        multiplier *= (angleDifference < 90) ? positiveEffect : negativeEffect;
-        return multiplier;
     }
 
     void ApplySurfaceTorques(float dragAmount)
@@ -238,4 +156,5 @@ public class AerodynamicController : MonoBehaviour
             }
         }
     }
+    
 }

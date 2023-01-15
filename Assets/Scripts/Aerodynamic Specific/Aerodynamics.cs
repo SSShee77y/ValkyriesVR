@@ -6,35 +6,37 @@ using UnityEngine;
 public class Aerodynamics : MonoBehaviour
 {
     [SerializeField]
-    private float _startingSpeed;
+    protected float _startingSpeed;
     
     [SerializeField]
-    private float _thrustFactor = 40f;
+    protected float _thrustFactor = 40f;
     [SerializeField]
-    private float _currentEngineSpeed;
+    protected float _currentEngineSpeed;
     public float CurrentEngineSpeed => _currentEngineSpeed;
     [SerializeField]
-    private float _engineIncreaseSpeed = 0.5f;
+    protected float _engineIncreaseSpeed = 0.5f;
     [SerializeField]
-    private float _dragFactor = 1f;
+    protected float _dragFactor = 1f;
     [SerializeField]
-    private float _maxFacingArea = 200f;
+    protected float _maxFacingArea = 100f;
     [SerializeField]
-    private float _fowardAreaFactor = 0.0025f;
+    protected float _fowardAreaFactor = 0.0025f;
     [SerializeField]
-    private float _upAreaFactor = 1.0f;
+    protected float _backwardAreaFactor = 1.0f;
     [SerializeField]
-    private float _rightAreaFactor = 1.0f;
+    protected float _upAreaFactor = 1.0f;
+    [SerializeField]
+    protected float _rightAreaFactor = 1.0f;
     
-    private Rigidbody _rb;
+    protected Rigidbody _rb;
 
-    void Start()
+    protected virtual void Start()
     {
         _rb = gameObject.GetComponent<Rigidbody>();
         SetSpeed(_startingSpeed);
     }
 
-    protected void SetSpeed(float speed)
+    protected virtual void SetSpeed(float speed)
     {
         float velX = Mathf.Cos(Vector3.Angle(transform.forward, Vector3.right) * Mathf.Deg2Rad) * speed;
         float velY = Mathf.Cos(Vector3.Angle(transform.forward, Vector3.up) * Mathf.Deg2Rad) * speed;
@@ -42,17 +44,15 @@ public class Aerodynamics : MonoBehaviour
         _rb.velocity = new Vector3(velX, velY, velZ);
     }
 
-    void FixedUpdate()
+    protected virtual void FixedUpdate()
     {
         ApplyThrust();
         ApplyDragLift();
     }
 
-    void ApplyThrust()
+    protected virtual void ApplyThrust()
     {
         float enginePercentage = 100;
-        if (enginePercentage <= 0)
-            enginePercentage = 0;
 
         if (_currentEngineSpeed >= enginePercentage - _engineIncreaseSpeed/2 && _currentEngineSpeed <= enginePercentage + _engineIncreaseSpeed/2)
             _currentEngineSpeed = enginePercentage;
@@ -65,7 +65,21 @@ public class Aerodynamics : MonoBehaviour
         _rb.AddRelativeForce(Vector3.forward * thrustAmount);
     }
 
-    void ApplyDragLift()
+    protected virtual void ApplyDragLift()
+    {
+        float dragAmount = DragAmountMath();
+        float dragUp = VelAngleDiffMultiplier(transform.up, _upAreaFactor, _upAreaFactor) * dragAmount;
+        float dragFoward = VelAngleDiffMultiplier(transform.forward, _fowardAreaFactor, _backwardAreaFactor) * dragAmount;
+        float dragRight = VelAngleDiffMultiplier(transform.right, _rightAreaFactor, _rightAreaFactor) * dragAmount;
+
+        // Force Applications
+        _rb.AddRelativeForce(Vector3.up * dragUp);
+        _rb.AddRelativeForce(Vector3.forward * dragFoward);
+        _rb.AddRelativeForce(Vector3.right * dragRight);
+        AdditionalDragMethods(dragAmount);
+    }
+
+    protected virtual float DragAmountMath()
     {
         float airDensity = Mathf.Pow(1.1068f, 2f - 0.788f * Mathf.Pow(transform.position.y / 1000f, 1.15f)); // Close approximation
         
@@ -78,6 +92,7 @@ public class Aerodynamics : MonoBehaviour
         else if (_rb.velocity.magnitude >= 408)
         {
             dragCoefficient = (float) (2.2674 - 0.0000025 * Mathf.Pow((_rb.velocity.magnitude - 408), 2));
+            if (dragCoefficient < 2) dragCoefficient = 2;
         }
         else
         {
@@ -89,29 +104,24 @@ public class Aerodynamics : MonoBehaviour
 
         // Drag Math
         float dragAmount = -1 * Mathf.Pow(_rb.velocity.magnitude, 2) / 2 * airDensity * _maxFacingArea * dragCoefficient * _dragFactor;
-        float dragUp = VelAngleDiffMultiplier(transform.up, _upAreaFactor, _upAreaFactor) * dragAmount;
-        float dragFoward = VelAngleDiffMultiplier(transform.forward, _fowardAreaFactor, 2) * dragAmount;
-        float dragRight = VelAngleDiffMultiplier(transform.right, _rightAreaFactor, _rightAreaFactor) * dragAmount;
-
-        // Force Applications
-        _rb.AddRelativeForce(Vector3.up * dragUp);
-        _rb.AddRelativeForce(Vector3.forward * dragFoward);
-        _rb.AddRelativeForce(Vector3.right * dragRight);
+        return dragAmount;
     }
 
-    float GetAngleOfAttack()
+    protected virtual void AdditionalDragMethods(float dragAmount) {}
+
+    public float GetAngleOfAttack()
     {
         float angleOfAttack = Vector3.Angle(transform.forward, Vector3.Normalize(_rb.velocity));
         //angleOfAttack *= (transform.forward.y < Vector3.Normalize(_rb.velocity).y) ? -1f: 1f;
         return angleOfAttack;
     }
 
-    float VelAngleDiffMultiplier(Vector3 transformDirection)
+    protected float VelAngleDiffMultiplier(Vector3 transformDirection)
     {
         return VelAngleDiffMultiplier(transformDirection, 1, 1);
     }
 
-    float VelAngleDiffMultiplier(Vector3 transformDirection, float positiveEffect, float negativeEffect)
+    protected float VelAngleDiffMultiplier(Vector3 transformDirection, float positiveEffect, float negativeEffect)
     {
         float angleDifference = Vector3.Angle(transformDirection, Vector3.Normalize(_rb.velocity));
         float multiplier = Mathf.Cos(angleDifference * Mathf.Deg2Rad);
