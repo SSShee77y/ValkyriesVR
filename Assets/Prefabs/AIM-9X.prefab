@@ -136,9 +136,10 @@ MonoBehaviour:
   _backwardAreaFactor: 0.8
   _upAreaFactor: 0.5
   _rightAreaFactor: 0.5
-  _turnFactor: 10
+  _turnFactor: 25
   _fuelTime: 2.5
   _lifeTime: 45
+  _missileAccuracy: 4
   _target: {fileID: 0}
   _activated: 0
   _explosion: {fileID: 4527228361036179331, guid: ebfcda185c255064599a6185088762cf, type: 3}

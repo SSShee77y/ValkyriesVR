@@ -9,6 +9,8 @@ public class MissileController : Aerodynamics
     [SerializeField]
     private float _lifeTime = 60f;
     [SerializeField]
+    private int _missileAccuracy = 4;
+    [SerializeField]
     private GameObject _target;
     [SerializeField]
     private bool _activated;
@@ -16,6 +18,7 @@ public class MissileController : Aerodynamics
     private GameObject _explosion;
 
     private ParticleSystem _particles;
+    private Vector3 _previousVelocity;
     
     void OnCollisionEnter(Collision other)
     {
@@ -40,6 +43,7 @@ public class MissileController : Aerodynamics
             _particles = childParticles;
             ParticleEnabled(false);
         }
+        _previousVelocity = _rb.velocity;
     }
 
     protected override void FixedUpdate()
@@ -92,7 +96,54 @@ public class MissileController : Aerodynamics
 
     protected override void AdditionalDragMethods(float dragAmount)
     {
+        RotateTowardsTarget(dragAmount);
+    }
+
+    void RotateTowardsTarget(float dragAmount)
+    {
+        Quaternion rotation = Quaternion.LookRotation(DirectionToTarget());
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, _turnFactor);
+    }
+
+    Vector3 DirectionToTarget()
+    {
+        Vector3 direction = (PredictedTargetPosition() - transform.position).normalized;
+        Debug.Log(PredictedTargetPosition());
+        return direction;
+    }
+
+    Vector3 PredictedTargetPosition()
+    {
         
+        Vector3 acceleration =
+            new Vector3((_rb.velocity.x - _previousVelocity.x) / Time.fixedDeltaTime,
+                        (_rb.velocity.y - _previousVelocity.y) / Time.fixedDeltaTime,
+                        (_rb.velocity.z - _previousVelocity.z) / Time.fixedDeltaTime);
+
+        float localForwardVelocity = Vector3.Dot(_rb.velocity, transform.forward);
+
+        float timeFromTarget = Vector3.Distance(gameObject.transform.position, _target.transform.position) / localForwardVelocity;
+
+        Vector3 predictedPosition =
+            new Vector3(_target.transform.position.x,
+                        _target.transform.position.y,
+                        _target.transform.position.z);
+        
+        if (_target.GetComponent<Rigidbody>() == null)
+        {
+            return predictedPosition;
+        }
+        for (int i = 0; i < _missileAccuracy; i++)
+        {
+            timeFromTarget = Vector3.Distance(gameObject.transform.position, predictedPosition) / _rb.velocity.magnitude;
+
+            predictedPosition =
+                new Vector3(_target.transform.position.x + (timeFromTarget * _target.GetComponent<Rigidbody>().velocity.x),
+                            _target.transform.position.y + (timeFromTarget * _target.GetComponent<Rigidbody>().velocity.y) + (timeFromTarget * -_rb.velocity.y),
+                            _target.transform.position.z + (timeFromTarget * _target.GetComponent<Rigidbody>().velocity.z));
+        }
+        _previousVelocity = _rb.velocity;
+        return predictedPosition;
     }
 
 }
