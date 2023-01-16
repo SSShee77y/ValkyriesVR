@@ -19,6 +19,7 @@ public class MissileController : Aerodynamics
     private GameObject _explosion;
 
     private ParticleSystem _particles;
+    private Vector3 _targetPreviousVelocity;
     
     void OnCollisionEnter(Collision other)
     {
@@ -107,18 +108,6 @@ public class MissileController : Aerodynamics
         velocityPosition = (neededVelocity - _rb.velocity);
 
         Vector3 newDirection = Vector3.Normalize(velocityPosition);
-
-        Vector3 positionDifference = (PredictedTargetPosition() - transform.position);
-
-        if (Vector3.Angle(new Vector3(positionDifference.normalized.x, 0, positionDifference.normalized.z), new Vector3(transform.forward.x, 0, transform.forward.z)) <= 15)
-        {
-            if (Mathf.Abs(positionDifference.x) < Mathf.Abs(positionDifference.z))
-                newDirection.z *= 0;
-            else if (Mathf.Abs(positionDifference.x) > Mathf.Abs(positionDifference.z))
-                newDirection.x *= 0;
-        }
-        
-        Debug.Log(gameObject.name + " | " + newDirection + " | " + RequiredVelocity() + " | " + velocityPosition);
             
         float turnMultiplier = TurnMultiplier(neededVelocity.normalized);
 
@@ -129,26 +118,31 @@ public class MissileController : Aerodynamics
 
     float TurnMultiplier(Vector3 direction)
     {
-        float angleDifference = Vector3.Angle(direction, transform.forward);
+        float angleDifference = Vector3.Angle(direction, _rb.velocity.normalized);
         float multiplier = Mathf.Sin(angleDifference * Mathf.Deg2Rad) + 0.001f;
         return multiplier;
     }
 
     Vector3 PredictedTargetPosition()
     {
-        float timeFromTarget = Vector3.Distance(gameObject.transform.position, _target.transform.position) / _rb.velocity.magnitude;
+        float timeFromTarget = Vector3.Distance(transform.position, _target.transform.position) / _rb.velocity.magnitude;
 
         Vector3 predictedPosition = _target.transform.position;
-        
-        if (_target.GetComponent<Rigidbody>() == null)
-        {
-            return predictedPosition;
-        }
-        for (int i = 0; i < _missileAccuracy; i++)
-        {
-            timeFromTarget = Vector3.Distance(gameObject.transform.position, predictedPosition) / _rb.velocity.magnitude;
 
-            predictedPosition = _target.transform.position + (timeFromTarget * _target.GetComponent<Rigidbody>().velocity);
+        if (_target.GetComponent<Rigidbody>() != null)
+        {
+            Vector3 acceleration = new Vector3();
+            if (_targetPreviousVelocity != null && _target.GetComponent<Rigidbody>() != null)
+            {
+                acceleration = (_target.GetComponent<Rigidbody>().velocity - _targetPreviousVelocity) / Time.fixedDeltaTime;
+                _targetPreviousVelocity = _target.GetComponent<Rigidbody>().velocity;
+            }
+            for (int i = 0; i < _missileAccuracy; i++)
+            {
+                timeFromTarget = Vector3.Distance(transform.position, predictedPosition) / _rb.velocity.magnitude;
+
+                predictedPosition = _target.transform.position + (timeFromTarget * _target.GetComponent<Rigidbody>().velocity) + (.5f * Mathf.Pow(timeFromTarget, 2) * acceleration);
+            }
         }
 
         return predictedPosition;
@@ -158,7 +152,7 @@ public class MissileController : Aerodynamics
     {
         Vector3 predictedPosition = PredictedTargetPosition();
         
-        float timeFromTarget = Vector3.Distance(gameObject.transform.position, predictedPosition) / _rb.velocity.magnitude;
+        float timeFromTarget = Vector3.Distance(transform.position, predictedPosition) / _rb.velocity.magnitude;
         
         Vector3 requiredVelocity = (predictedPosition - transform.position) / timeFromTarget;
 
