@@ -101,8 +101,23 @@ public class MissileController : Aerodynamics
 
     void RotateTowardsTarget(float dragAmount)
     {
-        Quaternion rotation = Quaternion.LookRotation(DirectionToTarget());
-        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, _turnFactor);
+        //Quaternion rotation = Quaternion.LookRotation(DirectionToTarget());
+        //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, _turnFactor);
+        Vector3 neededVelocity = RequiredVelocity();
+
+        float xVal = 0, yVal = 0;
+
+        if (_rb.velocity.x < neededVelocity.x)
+            yVal = 90;
+        else if (_rb.velocity.x > neededVelocity.x)
+            yVal = -90;
+
+        if (_rb.velocity.y < neededVelocity.y)
+            xVal = -90;
+        else if (_rb.velocity.y > neededVelocity.y)
+            xVal = 90;
+
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(xVal, yVal, 0), _turnFactor);
     }
 
     Vector3 DirectionToTarget()
@@ -114,20 +129,11 @@ public class MissileController : Aerodynamics
 
     Vector3 PredictedTargetPosition()
     {
-        
-        Vector3 acceleration =
-            new Vector3((_rb.velocity.x - _previousVelocity.x) / Time.fixedDeltaTime,
-                        (_rb.velocity.y - _previousVelocity.y) / Time.fixedDeltaTime,
-                        (_rb.velocity.z - _previousVelocity.z) / Time.fixedDeltaTime);
-
         float localForwardVelocity = Vector3.Dot(_rb.velocity, transform.forward);
 
-        float timeFromTarget = Vector3.Distance(gameObject.transform.position, _target.transform.position) / localForwardVelocity;
+        float timeFromTarget = Vector3.Distance(gameObject.transform.position, _target.transform.position) / _rb.velocity.magnitude;
 
-        Vector3 predictedPosition =
-            new Vector3(_target.transform.position.x,
-                        _target.transform.position.y,
-                        _target.transform.position.z);
+        Vector3 predictedPosition = _target.transform.position;
         
         if (_target.GetComponent<Rigidbody>() == null)
         {
@@ -142,8 +148,40 @@ public class MissileController : Aerodynamics
                             _target.transform.position.y + (timeFromTarget * _target.GetComponent<Rigidbody>().velocity.y) + (timeFromTarget * -_rb.velocity.y),
                             _target.transform.position.z + (timeFromTarget * _target.GetComponent<Rigidbody>().velocity.z));
         }
-        _previousVelocity = _rb.velocity;
+
         return predictedPosition;
+    }
+
+    Vector3 RequiredVelocity()
+    {
+        float localForwardVelocity = Vector3.Dot(_rb.velocity, transform.forward);
+
+        float timeFromTarget = Vector3.Distance(gameObject.transform.position, _target.transform.position) / _rb.velocity.magnitude;
+
+        Vector3 predictedPosition = _target.transform.position;
+        
+        if (_target.GetComponent<Rigidbody>() == null)
+        {
+            return new Vector3((predictedPosition.x - transform.position.x) / timeFromTarget,
+                        (predictedPosition.y - transform.position.y) / timeFromTarget,
+                        (predictedPosition.z - transform.position.z) / timeFromTarget);
+        }
+        for (int i = 0; i < _missileAccuracy; i++)
+        {
+            timeFromTarget = Vector3.Distance(gameObject.transform.position, predictedPosition) / _rb.velocity.magnitude;
+
+            predictedPosition =
+                new Vector3(_target.transform.position.x + (timeFromTarget * _target.GetComponent<Rigidbody>().velocity.x),
+                            _target.transform.position.y + (timeFromTarget * _target.GetComponent<Rigidbody>().velocity.y) + (timeFromTarget * -_rb.velocity.y),
+                            _target.transform.position.z + (timeFromTarget * _target.GetComponent<Rigidbody>().velocity.z));
+        }
+        
+        Vector3 requiredVelocity =
+            new Vector3((predictedPosition.x - transform.position.x) / timeFromTarget,
+                        (predictedPosition.y - transform.position.y) / timeFromTarget,
+                        (predictedPosition.z - transform.position.z) / timeFromTarget);
+
+        return requiredVelocity;
     }
 
 }
