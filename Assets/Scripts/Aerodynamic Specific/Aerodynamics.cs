@@ -8,6 +8,7 @@ public class Aerodynamics : MonoBehaviour
     [SerializeField]
     protected float _startingSpeed;
     
+    [Header("Thrust Attributes")]
     [SerializeField]
     protected float _thrustFactor = 40f;
     [SerializeField]
@@ -15,6 +16,8 @@ public class Aerodynamics : MonoBehaviour
     public float CurrentEngineSpeed => _currentEngineSpeed;
     [SerializeField]
     protected float _engineIncreaseSpeed = 0.5f;
+    
+    [Header("Drag Attributes")]
     [SerializeField]
     protected float _dragFactor = 1f;
     [SerializeField]

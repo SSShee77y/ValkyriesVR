@@ -23,11 +23,13 @@ public class AerodynamicController : Aerodynamics
         public float Factor;
     }
 
+    [Header("Faux Stall Attributes")]
     [SerializeField]
     private float _stallSpeed = 60f;
     [SerializeField]
     private float _stallFactor = 2f;
 
+    [Header("Throttle Control")]
     [SerializeField]
     private GameObject _throttleControl;
     [SerializeField]

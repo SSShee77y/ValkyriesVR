@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class MissileController : Aerodynamics
 {
+    [Header("Missile Specific Settings")]
     [SerializeField]
     private float _turnFactor = 10f;
     [SerializeField]
@@ -14,36 +15,42 @@ public class MissileController : Aerodynamics
     [SerializeField]
     private GameObject _target;
     [SerializeField]
-    private bool _activated;
-    [SerializeField]
     private GameObject _explosion;
 
+    private bool _activated;
     private ParticleSystem _particles;
     private Vector3 _targetPreviousVelocity;
+    private AudioSource _launchAudio;
     
     void OnCollisionEnter(Collision other)
     {
+        _rb.velocity = new Vector3();
         DetachParticles();
+        if (_activated == true)
+        {
+            Instantiate(_explosion, other.contacts[0].point, this.transform.rotation);
+        }
         Destroy(this.gameObject);
     }
 
     void OnDisable() {
         if(this.gameObject.scene.isLoaded) {
-            if (_activated == true)
-            {
-                Instantiate(_explosion, this.transform.position, this.transform.rotation);
-            }
+            
         }
     }
 
     protected override void Start()
     {
         base.Start();
+
         ParticleSystem childParticles = GetComponentInChildren<ParticleSystem>();
         if (childParticles != null) {
             _particles = childParticles;
             ParticleEnabled(false);
         }
+
+        if (GetComponent<AudioSource>() != null)
+            _launchAudio = GetComponent<AudioSource>();
     }
 
     protected override void FixedUpdate()
@@ -52,7 +59,7 @@ public class MissileController : Aerodynamics
         {
             gameObject.transform.parent = null;
             _rb.constraints = RigidbodyConstraints.None;
-            _lifeTime -= Time.fixedDeltaTime;
+            if (_target == null) _lifeTime -= Time.fixedDeltaTime;
 
             ApplyDragLift();
 
@@ -96,7 +103,7 @@ public class MissileController : Aerodynamics
 
     protected override void AdditionalDragMethods(float dragAmount)
     {
-        RotateTowardsTarget(dragAmount);
+        if (_target != null) RotateTowardsTarget(dragAmount);
     }
 
     void RotateTowardsTarget(float dragAmount)
@@ -170,9 +177,16 @@ public class MissileController : Aerodynamics
         return requiredVelocity;
     }
 
+    [ContextMenu("ActivateMissile")]
+    public void ActivateMissile()
+    {
+        SetMissileActive(true);
+    }
+
     public void SetMissileActive(bool isActive)
     {
         _activated = isActive;
+        if (isActive && _launchAudio != null) _launchAudio.Play();
         GameObject currentObject = gameObject;
         Rigidbody parentRigidbody = new Rigidbody();
         while (currentObject.transform.parent.gameObject != null)
@@ -192,6 +206,7 @@ public class MissileController : Aerodynamics
     public void SetMissileActive(bool isActive, Vector3 withVelocity)
     {
         _activated = isActive;
+        if (isActive && _launchAudio != null) _launchAudio.Play();
         gameObject.transform.parent = null;
         _rb.constraints = RigidbodyConstraints.None;
         _rb.velocity = withVelocity;

@@ -100,6 +100,18 @@ public class PlayerWeaponry : MonoBehaviour
         return iterations;
     }
 
+    [ContextMenu("FireWeapon")]
+    public void FireWeapon()
+    {
+        FireWeapon(true);
+    }
+
+    [ContextMenu("StopFireWeapon")]
+    public void StopFireWeapon()
+    {
+        FireWeapon(false);
+    }
+
     public void FireWeapon(bool toFire)
     {
         WeaponryList currentList = _aircraftWeaponsList[_currentIndex];
@@ -109,13 +121,17 @@ public class PlayerWeaponry : MonoBehaviour
         else
             EnableMainGun(false);
 
+        if (toFire == false) return;
+
         if (currentList.type != WeaponryList.Type.GUN)
         {
             foreach (WeaponryList.Weaponry weapon in currentList.list)
             {
-                if (weapon.count > 0 && weapon.gameObject.GetComponent<MissileController>() != null)
+                if (weapon.count > 0 && weapon.gameObject != null && weapon.gameObject.GetComponent<MissileController>() != null)
                 {
-                    weapon.gameObject.GetComponent<MissileController>().SetMissileActive(true);
+                    weapon.gameObject.GetComponent<MissileController>().SetMissileActive(toFire);
+                    weapon.gameObject = null;
+                    weapon.count--;
                     return;
                 }
             }
@@ -133,6 +149,7 @@ public class PlayerWeaponry : MonoBehaviour
         }
     }
 
+    [ContextMenu("NextWeaponGroup")]
     public void NextWeaponGroup()
     {
         _currentIndex++;
