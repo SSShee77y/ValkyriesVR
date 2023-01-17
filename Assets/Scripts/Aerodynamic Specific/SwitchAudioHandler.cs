@@ -30,7 +30,7 @@ public class SwitchAudioHandler : AudioManager
                 if (_inRange == false)
                 {
                     _inRange = true;
-                    Play("Switch Flip");
+                    Play(Sounds[0].name);
                 }
                 return;
             }

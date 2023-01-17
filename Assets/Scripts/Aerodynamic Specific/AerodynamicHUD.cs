@@ -21,15 +21,19 @@ public class AerodynamicHUD : MonoBehaviour
     private TextMeshProUGUI heading;
     [SerializeField]
     private TextMeshProUGUI AoaMachG;
+    [SerializeField]
+    private TextMeshProUGUI weaponry;
 
     private Rigidbody rb;
     private Transform pitchIndicatorChildTransform;
     private float[] lastG = new float[2];
     private Vector3 previousVelocity;
+    private PlayerWeaponry _pw;
 
     void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();
+        _pw = gameObject.GetComponent<PlayerWeaponry>();
         pitchIndicatorChildTransform = pitchIndicator.GetChild(0);
         ConstructPitchLadder();
     }
@@ -90,6 +94,7 @@ public class AerodynamicHUD : MonoBehaviour
         altimeter.text = string.Format("{0:#,0.} ft", rb.transform.position.y * 3.28084f);
         heading.text = string.Format("{0:#,0.}", rb.transform.eulerAngles.y);
         AoaMachG.text = string.Format("{0:#,0.0}\n{1:#,0.00}\n{2:#,0.0}", GetAngleOfAttack(), rb.velocity.magnitude / 343f, GetGForces());
+        weaponry.text = string.Format("{0}\n{1:#,0.}", _pw.GetCurrentWeaponGroup().name, _pw.GetCurrentWeaponGroup().TotalCount());
     }
 
     float GetAngleOfAttack()

@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class ColliderController : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject _OVRRig;
+    [SerializeField]
+    private Transform _rigSeat;
+
     private AerodynamicController _ac;
 
     void Start()
@@ -20,6 +25,8 @@ public class ColliderController : MonoBehaviour
                 if (c2 != c1) Physics.IgnoreCollision(c2, c1, true);
             }
         }
+
+        _OVRRig.transform.SetParent(_rigSeat, true);
     }
 
     void Update() {
