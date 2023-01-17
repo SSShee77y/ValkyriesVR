@@ -11,7 +11,7 @@ public class PlayerWeaponry : MonoBehaviour
 
         public enum Type
         {
-            Gun,
+            GUN,
             AIM9,
             AIM120,
             AGM,
@@ -54,8 +54,8 @@ public class PlayerWeaponry : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (_mainGun.emission.enabled == true && GetList(WeaponryList.Type.Gun).TotalCount() > 0)
-            _aircraftWeaponsList[GetListIndex(WeaponryList.Type.Gun)].list[0].count -= _mainGun.emission.rateOverTimeMultiplier * Time.fixedDeltaTime;
+        if (_mainGun.emission.enabled == true && GetList(WeaponryList.Type.GUN).TotalCount() > 0)
+            _aircraftWeaponsList[GetListIndex(WeaponryList.Type.GUN)].list[0].count -= _mainGun.emission.rateOverTimeMultiplier * Time.fixedDeltaTime;
         else if (_mainGun.emission.enabled == true)
             EnableMainGun(false);
     }
@@ -64,7 +64,7 @@ public class PlayerWeaponry : MonoBehaviour
     {
         foreach (WeaponryList weaponsList in _aircraftWeaponsList)
         {
-            if (weaponsList.type == WeaponryList.Type.Gun)
+            if (weaponsList.type == WeaponryList.Type.GUN)
             {
                 _mainGun = weaponsList.list[0].gameObject.GetComponent<ParticleSystem>();
                 var particleEmission = _mainGun.emission;
@@ -102,10 +102,24 @@ public class PlayerWeaponry : MonoBehaviour
 
     public void FireWeapon(bool toFire)
     {
-        if (_aircraftWeaponsList[_currentIndex].type == WeaponryList.Type.Gun)
+        WeaponryList currentList = _aircraftWeaponsList[_currentIndex];
+
+        if (currentList.type == WeaponryList.Type.GUN)
             EnableMainGun(toFire);
         else
             EnableMainGun(false);
+
+        if (currentList.type != WeaponryList.Type.GUN)
+        {
+            foreach (WeaponryList.Weaponry weapon in currentList.list)
+            {
+                if (weapon.count > 0 && weapon.gameObject.GetComponent<MissileController>() != null)
+                {
+                    weapon.gameObject.GetComponent<MissileController>().SetMissileActive(true);
+                    return;
+                }
+            }
+        }
     }
 
     public void EnableMainGun(bool isEnabled)
@@ -114,7 +128,7 @@ public class PlayerWeaponry : MonoBehaviour
         {
             var particleEmission = _mainGun.emission;
             particleEmission.enabled = isEnabled;
-            if (GetList(WeaponryList.Type.Gun).TotalCount() <= 0)
+            if (GetList(WeaponryList.Type.GUN).TotalCount() <= 0)
                 particleEmission.enabled = false;
         }
     }

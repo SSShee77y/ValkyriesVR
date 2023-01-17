@@ -108,6 +108,18 @@ public class MissileController : Aerodynamics
         velocityPosition = (neededVelocity - _rb.velocity);
 
         Vector3 newDirection = Vector3.Normalize(velocityPosition);
+
+        Vector3 positionDifference = (PredictedTargetPosition() - transform.position);
+
+        if (Vector3.Angle(new Vector3(positionDifference.normalized.x, 0, positionDifference.normalized.z), new Vector3(transform.forward.x, 0, transform.forward.z)) <= 15)
+        {
+            if (Mathf.Abs(positionDifference.x) < Mathf.Abs(positionDifference.z))
+                newDirection.z *= 0;
+            else if (Mathf.Abs(positionDifference.x) > Mathf.Abs(positionDifference.z))
+                newDirection.x *= 0;
+        } else {
+            newDirection = positionDifference.normalized;
+        }
             
         float turnMultiplier = TurnMultiplier(neededVelocity.normalized);
 
@@ -118,11 +130,10 @@ public class MissileController : Aerodynamics
 
     float TurnMultiplier(Vector3 direction)
     {
-        float angleDifference = Vector3.Angle(direction, _rb.velocity.normalized);
+        float angleDifference = Vector3.Angle(direction, transform.forward);
         float multiplier = Mathf.Sin(angleDifference * Mathf.Deg2Rad) + 0.001f;
         return multiplier;
     }
-
     Vector3 PredictedTargetPosition()
     {
         float timeFromTarget = Vector3.Distance(transform.position, _target.transform.position) / _rb.velocity.magnitude;
@@ -157,5 +168,37 @@ public class MissileController : Aerodynamics
         Vector3 requiredVelocity = (predictedPosition - transform.position) / timeFromTarget;
 
         return requiredVelocity;
+    }
+
+    public void SetMissileActive(bool isActive)
+    {
+        _activated = isActive;
+        GameObject currentObject = gameObject;
+        Rigidbody parentRigidbody = new Rigidbody();
+        while (currentObject.transform.parent.gameObject != null)
+        {
+            currentObject = currentObject.transform.parent.gameObject;
+            parentRigidbody = currentObject.GetComponent<Rigidbody>();
+            if (parentRigidbody != null)
+            {
+                gameObject.transform.parent = null;
+                _rb.constraints = RigidbodyConstraints.None;
+                _rb.velocity = parentRigidbody.velocity;
+                return;
+            }
+        }
+    }
+
+    public void SetMissileActive(bool isActive, Vector3 withVelocity)
+    {
+        _activated = isActive;
+        gameObject.transform.parent = null;
+        _rb.constraints = RigidbodyConstraints.None;
+        _rb.velocity = withVelocity;
+    }
+
+    public void SetTarget(GameObject target)
+    {
+        _target = target;
     }
 }
