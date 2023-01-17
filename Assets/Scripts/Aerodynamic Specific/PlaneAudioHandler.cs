@@ -28,10 +28,10 @@ public class PlaneAudioHandler : AudioManager
             Stop("Jet Engine");
         }
 
-        if (_ac.CurrentEngineSpeed > 110)
+        if (_ac.CurrentEngineSpeed > 101)
         {
             Play("Afterburner");
-            SetVolume("Afterburner", Mathf.Sqrt((_ac.CurrentEngineSpeed - 100) * 6) / 10f);
+            SetVolume("Afterburner", Mathf.Sqrt((_ac.CurrentEngineSpeed - 101) * 6) / 10f);
         }
         else
         {

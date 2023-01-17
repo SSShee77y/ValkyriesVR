@@ -55,11 +55,16 @@ public class AerodynamicController : Aerodynamics
             enginePercentage = 0;
 
         if (_currentEngineSpeed >= enginePercentage - _engineIncreaseSpeed/2 && _currentEngineSpeed <= enginePercentage + _engineIncreaseSpeed/2)
-            _currentEngineSpeed = enginePercentage;
+        {
+            if (_currentEngineSpeed <= 100)
+                _currentEngineSpeed = enginePercentage;
+            else if (_currentEngineSpeed >= enginePercentage - _engineIncreaseSpeed/10 && _currentEngineSpeed <= enginePercentage + _engineIncreaseSpeed/10)
+                _currentEngineSpeed = enginePercentage;
+        }
         else if (_currentEngineSpeed > enginePercentage)
-            _currentEngineSpeed -= _engineIncreaseSpeed;
+            _currentEngineSpeed -= (_currentEngineSpeed <= 100) ? _engineIncreaseSpeed : _engineIncreaseSpeed / 5;
         else
-            _currentEngineSpeed += _engineIncreaseSpeed;
+            _currentEngineSpeed += (_currentEngineSpeed <= 100) ? _engineIncreaseSpeed : _engineIncreaseSpeed / 5;
 
         float thrustAmount = CalculateEnginePropulsion(_currentEngineSpeed) * _thrustFactor;
         _rb.AddRelativeForce(Vector3.forward * thrustAmount);

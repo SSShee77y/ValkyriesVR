@@ -86,7 +86,7 @@ public class PositionLockConstrainer : MonoBehaviour
 
         if (XPosition.Constrain)
         {
-            posX = Mathf.Clamp(posZ, XPosition.MinDisplacment, XPosition.MaxDisplacment);
+            posX = Mathf.Clamp(posX, XPosition.MinDisplacment, XPosition.MaxDisplacment);
         }
         if (YPosition.Constrain)
         {
