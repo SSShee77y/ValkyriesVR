@@ -15,6 +15,8 @@ public class ColliderController : MonoBehaviour
     {
         _ac = gameObject.GetComponent<AerodynamicController>();
 
+        _OVRRig.transform.parent = null;
+
         foreach (Collider c1 in GetComponentsInChildren<Collider>())
         {
             if (gameObject.GetComponent<Collider>() != null)

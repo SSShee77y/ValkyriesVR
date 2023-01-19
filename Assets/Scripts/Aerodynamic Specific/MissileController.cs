@@ -186,6 +186,7 @@ public class MissileController : Aerodynamics
     public void SetMissileActive(bool isActive)
     {
         _activated = isActive;
+        RemoveFixedJoint();
         if (isActive && _launchAudio != null) _launchAudio.Play();
         GameObject currentObject = gameObject;
         Rigidbody parentRigidbody = new Rigidbody();
@@ -206,14 +207,25 @@ public class MissileController : Aerodynamics
     public void SetMissileActive(bool isActive, Vector3 withVelocity)
     {
         _activated = isActive;
+        RemoveFixedJoint();
         if (isActive && _launchAudio != null) _launchAudio.Play();
         gameObject.transform.parent = null;
         _rb.constraints = RigidbodyConstraints.None;
         _rb.velocity = withVelocity;
     }
 
+    void RemoveFixedJoint()
+    {
+        if (GetComponent<FixedJoint>() != null)
+        {
+            Destroy(GetComponent<FixedJoint>());
+        }
+    }
+
     public void SetTarget(GameObject target)
     {
         _target = target;
     }
+
+    
 }

@@ -36,6 +36,8 @@ public class AerodynamicController : Aerodynamics
     private float _maximumThrottleDisplacement;
     private float _minimumThrottleDisplacement;
     [SerializeField]
+    private float _ABIncreaseFactor;
+    [SerializeField]
     private bool _engineTest = false;
 
     [SerializeField]
@@ -60,13 +62,14 @@ public class AerodynamicController : Aerodynamics
         {
             if (_currentEngineSpeed <= 100)
                 _currentEngineSpeed = enginePercentage;
-            else if (_currentEngineSpeed >= enginePercentage - _engineIncreaseSpeed/10 && _currentEngineSpeed <= enginePercentage + _engineIncreaseSpeed/10)
+            else if (_currentEngineSpeed >= enginePercentage - (_engineIncreaseSpeed / 2 * _ABIncreaseFactor) &&
+                     _currentEngineSpeed <= enginePercentage + (_engineIncreaseSpeed / 2 * _ABIncreaseFactor))
                 _currentEngineSpeed = enginePercentage;
         }
         else if (_currentEngineSpeed > enginePercentage)
-            _currentEngineSpeed -= (_currentEngineSpeed <= 100) ? _engineIncreaseSpeed : _engineIncreaseSpeed / 5;
+            _currentEngineSpeed -= (_currentEngineSpeed <= 100) ? _engineIncreaseSpeed : _engineIncreaseSpeed * _ABIncreaseFactor;
         else
-            _currentEngineSpeed += (_currentEngineSpeed <= 100) ? _engineIncreaseSpeed : _engineIncreaseSpeed / 5;
+            _currentEngineSpeed += (_currentEngineSpeed <= 100) ? _engineIncreaseSpeed : _engineIncreaseSpeed * _ABIncreaseFactor;
 
         float thrustAmount = CalculateEnginePropulsion(_currentEngineSpeed) * _thrustFactor;
         _rb.AddRelativeForce(Vector3.forward * thrustAmount);
@@ -88,7 +91,7 @@ public class AerodynamicController : Aerodynamics
             return 1200f + 15 * (throttlePercentage - 80);
         if (throttlePercentage <= 100)
             return 1425f + 55 * (throttlePercentage - 95);
-        return 1700f + 40 * (throttlePercentage - 100);
+        return 1700f + 80 * (throttlePercentage - 100);
     }
 
     protected override void AdditionalDragMethods(float dragAmount)
@@ -151,7 +154,7 @@ public class AerodynamicController : Aerodynamics
             {
                 if (controlSurface.transform.localEulerAngles.x != 0) {
                     float torqueAmount = VelAngleDiffMultiplier(controlSurface.transform.up) * dragAmount * controlSurface.Factor;
-                    _rb.AddRelativeForce(controlSurface.transform.up * torqueAmount);
+                    _rb.AddForce(controlSurface.transform.up * torqueAmount);
                 }
             }
 

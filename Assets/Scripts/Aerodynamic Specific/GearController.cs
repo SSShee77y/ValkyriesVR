@@ -76,33 +76,33 @@ public class GearController : MonoBehaviour
     {
         foreach (RotationSurface surface in _surfaceList)
         {
-            Quaternion toRotation = transform.localRotation;
+            Quaternion toRotation = surface.transform.localRotation;
 
             if (transform.localPosition.Equals(_firstPosition))
-                toRotation = Quaternion.Euler(surface.rotationOne.x, surface.rotationOne.y, surface.rotationOne.z);
+            {
+                toRotation = Quaternion.Euler(surface.rotationOne);
+            }
             else if (transform.localPosition.Equals(_secondPosition))
-                toRotation = Quaternion.Euler(surface.rotationOne.x, surface.rotationOne.y, surface.rotationOne.z);
-
-            if (!toRotation.Equals(transform.localRotation))
-                surface.transform.localRotation = Quaternion.RotateTowards(transform.localRotation, toRotation, surface.rotationSpeed * Time.deltaTime);
+            {
+                toRotation = Quaternion.Euler(surface.rotationTwo);
+            }
+            
+            surface.transform.localRotation = Quaternion.RotateTowards(surface.transform.localRotation, toRotation, surface.rotationSpeed * Time.deltaTime);
         }
 
-        if (transform.localPosition.Equals(_firstPosition))
-            if (invokedEventOne == false)
-            {
-                Vector3 velocity = _planeRigidbody.velocity;
-                Vector3 angularVelocity = _planeRigidbody.angularVelocity;
-                _gearEvent.eventOne.Invoke();
-                invokedEventOne = true;
-                _planeRigidbody.velocity = velocity;
-                _planeRigidbody.angularVelocity = angularVelocity;
-
-            }
-        else if (transform.localPosition.Equals(_secondPosition))
-            if (invokedEventOne == true)
-            {
-                _gearEvent.eventTwo.Invoke();
-                invokedEventOne = false;
-            }
+        if (transform.localPosition.Equals(_firstPosition) && invokedEventOne == false)
+        {
+            Vector3 velocity = _planeRigidbody.velocity;
+            Vector3 angularVelocity = _planeRigidbody.angularVelocity;
+            _gearEvent.eventOne.Invoke();
+            invokedEventOne = true;
+            _planeRigidbody.velocity = velocity;
+            _planeRigidbody.angularVelocity = angularVelocity;
+        }
+        else if (transform.localPosition.Equals(_secondPosition) && invokedEventOne == true)
+        {
+            _gearEvent.eventTwo.Invoke();
+            invokedEventOne = false;
+        }
     }
 }

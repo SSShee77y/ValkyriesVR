@@ -43,21 +43,35 @@ public class PlayerWeaponry : MonoBehaviour
     private List<WeaponryList> _aircraftWeaponsList = new List<WeaponryList>();
 
     private int _currentIndex = 0;
-
     private ParticleSystem _mainGun;
+    private Rigidbody _rb;
 
     void Start()
     {
         SortWeaponry();
         EnableMainGun(false);
+        _rb = GetComponent<Rigidbody>();
     }
 
-    void FixedUpdate()
+    void Update()
     {
+        var mainGun = _mainGun.main;
+        mainGun.startSpeedMultiplier = GetFowardVelocity() + 1000f;
+        
         if (_mainGun.emission.enabled == true && GetList(WeaponryList.Type.GUN).TotalCount() > 0)
             _aircraftWeaponsList[GetListIndex(WeaponryList.Type.GUN)].list[0].count -= _mainGun.emission.rateOverTimeMultiplier * Time.fixedDeltaTime;
         else if (_mainGun.emission.enabled == true)
             EnableMainGun(false);
+    }
+
+    void FixedUpdate()
+    {
+        
+    }
+
+    float GetFowardVelocity()
+    {
+        return Vector3.Dot(_rb.velocity, transform.forward);
     }
 
     void SortWeaponry()
@@ -129,7 +143,7 @@ public class PlayerWeaponry : MonoBehaviour
             {
                 if (weapon.count > 0 && weapon.gameObject != null && weapon.gameObject.GetComponent<MissileController>() != null)
                 {
-                    weapon.gameObject.GetComponent<MissileController>().SetMissileActive(toFire);
+                    weapon.gameObject.GetComponent<MissileController>().ActivateMissile();
                     weapon.gameObject = null;
                     weapon.count--;
                     return;
