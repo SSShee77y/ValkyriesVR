@@ -12,13 +12,15 @@ public class BrakeSystem : MonoBehaviour
     private float _rotationSpeed;
     [SerializeField]
     private AerodynamicController _planeController;
-
+    
+    private ColliderController _cc;
     private Quaternion _normalRotation;
     private bool _brakeActivated;
 
     void Start()
     {
-        _normalRotation = _airbrake.localRotation;        
+        _normalRotation = _airbrake.localRotation;
+        _cc = _planeController.GetComponent<ColliderController>();        
     }
 
     void Update()
@@ -28,12 +30,14 @@ public class BrakeSystem : MonoBehaviour
         if (_brakeActivated)
         {
             toRotation = Quaternion.Euler(_brakeRotation);
-            SetWheelBrakeTorque(100f);
+            SetWheelBrakeTorque(10_000f);
+            _cc.SetIsBraking(true);
         }
         else
         {
             toRotation = _normalRotation;
             SetWheelBrakeTorque(0f);
+            _cc.SetIsBraking(false);
         }
 
         _airbrake.localRotation = Quaternion.RotateTowards(_airbrake.localRotation, toRotation, _rotationSpeed * Time.deltaTime);

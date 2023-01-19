@@ -2827,18 +2827,6 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 433066722}
           m_TargetAssemblyTypeName: PlayerWeaponry, Assembly-CSharp
-          m_MethodName: NextWeaponGroup
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 1
-          m_CallState: 2
-        - m_Target: {fileID: 433066722}
-          m_TargetAssemblyTypeName: PlayerWeaponry, Assembly-CSharp
           m_MethodName: FireWeapon
           m_Mode: 6
           m_Arguments:
@@ -2847,7 +2835,19 @@ MonoBehaviour:
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
-            m_BoolArgument: 1
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 433066722}
+          m_TargetAssemblyTypeName: PlayerWeaponry, Assembly-CSharp
+          m_MethodName: NextWeaponGroup
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
           m_CallState: 2
     _whenReleased:
       m_PersistentCalls:
@@ -5458,13 +5458,13 @@ MonoBehaviour:
     Factor: 2
   - transform: {fileID: 8483340067772254452}
     surfaceType: 4
-    Factor: 12
+    Factor: 8
   - transform: {fileID: 8292179621064872998}
     surfaceType: 4
-    Factor: 12
+    Factor: 8
   - transform: {fileID: 4078734106913541583}
     surfaceType: 5
-    Factor: 15
+    Factor: 10
 --- !u!114 &1558636326089023246
 MonoBehaviour:
   m_ObjectHideFlags: 0

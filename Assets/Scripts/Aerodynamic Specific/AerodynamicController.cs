@@ -128,7 +128,7 @@ public class AerodynamicController : Aerodynamics
 
                 // Apply fake lift torque
                 float liftTorqueAmount = VelAngleDiffMultiplier(transform.up) * dragAmount * controlSurface.Factor;
-                if (GetAngleOfAttack() >= Mathf.Abs(2.5f) && _rb.velocity.magnitude <= _stallSpeed) // If at stall speed
+                if (GetAngleOfAttack() >= Mathf.Abs(20f) && _rb.velocity.magnitude <= _stallSpeed) // If at stall speed
                 {
                     /*
                      * TO-DO

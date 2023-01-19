@@ -10,6 +10,7 @@ public class ColliderController : MonoBehaviour
     private Transform _rigSeat;
 
     private AerodynamicController _ac;
+    private bool _isBraking;
 
     void Start()
     {
@@ -34,9 +35,16 @@ public class ColliderController : MonoBehaviour
     void Update() {
         foreach (WheelCollider w in GetComponentsInChildren<WheelCollider>())
         {
-            if (_ac.CurrentEngineSpeed > 0.5f)
+            if (_isBraking == false && _ac.CurrentEngineSpeed > 1f)
             {
-                w.motorTorque = 0.00001f;
+                if (_ac.CurrentEngineSpeed >= 20)
+                {
+                    w.motorTorque = 1_000f;
+                }
+                else
+                {
+                    w.motorTorque = _ac.CurrentEngineSpeed * 50;
+                }
             }
             else 
             {
@@ -55,5 +63,10 @@ public class ColliderController : MonoBehaviour
             }
         }
         return false;
-    } 
+    }
+
+    public void SetIsBraking(bool isBraking)
+    {
+        _isBraking = isBraking;
+    }
 }
