@@ -26,7 +26,7 @@ public class ControlToFlaps : MonoBehaviour
         {
             if (_sourceTransform.localPosition.Equals(control.controlPosition))
             {
-                transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(control.degrees.x, control.degrees.y, control.degrees.z), _rotationSpeed * Time.deltaTime);
+                transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(control.degrees), _rotationSpeed * Time.deltaTime);
             }
         }
     }

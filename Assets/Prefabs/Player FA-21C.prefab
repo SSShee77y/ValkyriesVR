@@ -2793,25 +2793,13 @@ MonoBehaviour:
     _whenPressed:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 433066722}
-          m_TargetAssemblyTypeName: PlayerWeaponry, Assembly-CSharp
-          m_MethodName: NextWeaponGroup
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: 
+          m_MethodName: 
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 1
-          m_CallState: 2
-        - m_Target: {fileID: 433066722}
-          m_TargetAssemblyTypeName: PlayerWeaponry, Assembly-CSharp
-          m_MethodName: FireWeapon
-          m_Mode: 6
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_ObjectArgumentAssemblyTypeName: 
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
@@ -2837,9 +2825,21 @@ MonoBehaviour:
     _whenPressed:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_MethodName: SetActive
+        - m_Target: {fileID: 433066722}
+          m_TargetAssemblyTypeName: PlayerWeaponry, Assembly-CSharp
+          m_MethodName: NextWeaponGroup
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+        - m_Target: {fileID: 433066722}
+          m_TargetAssemblyTypeName: PlayerWeaponry, Assembly-CSharp
+          m_MethodName: FireWeapon
           m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -3737,6 +3737,7 @@ GameObject:
   - component: {fileID: 1558636327254021004}
   - component: {fileID: 1558636327254021006}
   - component: {fileID: 1558636327254021001}
+  - component: {fileID: 754903693053802536}
   m_Layer: 0
   m_Name: ThrottleGrabCollider
   m_TagString: Untagged
@@ -3946,7 +3947,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1558636327254021003}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 23007014dc22a6847af1809cae06995f, type: 3}
   m_Name: 
@@ -3957,9 +3958,9 @@ MonoBehaviour:
     _whenPressed:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_MethodName: SetActive
+        - m_Target: {fileID: 754903693053802536}
+          m_TargetAssemblyTypeName: BrakeSystem, Assembly-CSharp
+          m_MethodName: SetBrakeActive
           m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -3972,9 +3973,9 @@ MonoBehaviour:
     _whenReleased:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_MethodName: SetActive
+        - m_Target: {fileID: 754903693053802536}
+          m_TargetAssemblyTypeName: BrakeSystem, Assembly-CSharp
+          m_MethodName: SetBrakeActive
           m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -4016,38 +4017,22 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  - SelectedButton: 2
-    useSingleCall: 1
-    _whenPressed:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_MethodName: SetActive
-          m_Mode: 6
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 1
-          m_CallState: 2
-    _whenReleased:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_MethodName: SetActive
-          m_Mode: 6
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+--- !u!114 &754903693053802536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1558636327254021003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7eb6840c3131cfa40b4eec066b9c8217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _airbrake: {fileID: 4078734106913541583}
+  _brakeRotation: {x: 55, y: 0, z: 0}
+  _rotationSpeed: 30
+  _planeController: {fileID: 1558636326089023241}
 --- !u!1 &1558636327274563683
 GameObject:
   m_ObjectHideFlags: 0
@@ -5277,7 +5262,7 @@ GameObject:
   - component: {fileID: 433066722}
   m_Layer: 0
   m_Name: Player FA-21C
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5402,7 +5387,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _OVRRig: {fileID: 0}
-  _rigSeat: {fileID: 0}
+  _rigSeat: {fileID: 2065255730806086070}
 --- !u!114 &1558636326089023240
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5455,16 +5440,16 @@ MonoBehaviour:
   _controlSurfaces:
   - transform: {fileID: 6519070414714706787}
     surfaceType: 2
-    Factor: 5
+    Factor: 9
   - transform: {fileID: 2929077050911234763}
     surfaceType: 2
-    Factor: 5
+    Factor: 9
   - transform: {fileID: 6122465308228038558}
     surfaceType: 0
-    Factor: 8
+    Factor: 12
   - transform: {fileID: 1783873091850711293}
     surfaceType: 1
-    Factor: 8
+    Factor: 12
   - transform: {fileID: 9158087323044189331}
     surfaceType: 3
     Factor: 2
@@ -5473,13 +5458,13 @@ MonoBehaviour:
     Factor: 2
   - transform: {fileID: 8483340067772254452}
     surfaceType: 4
-    Factor: 10
+    Factor: 12
   - transform: {fileID: 8292179621064872998}
     surfaceType: 4
-    Factor: 10
+    Factor: 12
   - transform: {fileID: 4078734106913541583}
     surfaceType: 5
-    Factor: 10
+    Factor: 15
 --- !u!114 &1558636326089023246
 MonoBehaviour:
   m_ObjectHideFlags: 0

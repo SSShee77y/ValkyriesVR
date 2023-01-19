@@ -162,7 +162,7 @@ public class AerodynamicController : Aerodynamics
             {
                 float torqueAmount = -1f * VelAngleDiffMultiplier(controlSurface.transform.up) * dragAmount * controlSurface.Factor;
                 float forceAmount = Mathf.Cos(Vector3.Angle(controlSurface.transform.up, transform.forward * -1f) * Mathf.Deg2Rad) * torqueAmount;
-                _rb.AddRelativeForce(Vector3.forward * forceAmount);
+                if (controlSurface.transform.localEulerAngles.x != 0) _rb.AddRelativeForce(Vector3.forward * forceAmount);
             }
         }
     }
