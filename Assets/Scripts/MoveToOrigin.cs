@@ -8,18 +8,20 @@ public class MoveToOrigin : MonoBehaviour
 
     private GameObject _player;
     private List<GameObject> _gameObjects = new List<GameObject>();
-    private int nonMissileCount;
+    private int _nonTerrainCount;
+
+    private ParticleSystem.Particle[] _particles = null;
 
     void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player");
 
+        _gameObjects.AddRange(GameObjectNoParentWithTag("Terrain"));
+        _nonTerrainCount = _gameObjects.Count;
+
         _gameObjects.Add(_player);
         _gameObjects.AddRange(GameObjectNoParentWithTag("Ally"));
         _gameObjects.AddRange(GameObjectNoParentWithTag("Enemy"));
-        _gameObjects.AddRange(GameObjectNoParentWithTag("Terrain"));
-        nonMissileCount = _gameObjects.Count;
-        
         _gameObjects.AddRange(GameObjectNoParentWithTag("Missile"));
     }
 
@@ -28,11 +30,12 @@ public class MoveToOrigin : MonoBehaviour
         /*
          *  Add particles to move as well
          */
-        ReAddMissiles();
+        ReAddObjects();
         Vector3 movePositions = CheckPlayerPosition();
         if (!movePositions.Equals(new Vector3()))
         {
             MoveAllObjects(movePositions);
+            MoveAllParticles(movePositions);
         }
     }
 
@@ -51,12 +54,15 @@ public class MoveToOrigin : MonoBehaviour
         return goList;
     }
 
-    void ReAddMissiles()
+    void ReAddObjects()
     {
-        while (_gameObjects.Count > nonMissileCount)
+        while (_gameObjects.Count > _nonTerrainCount)
         {
             _gameObjects.RemoveAt(_gameObjects.Count - 1);
         }
+        _gameObjects.Add(_player);
+        _gameObjects.AddRange(GameObjectNoParentWithTag("Ally"));
+        _gameObjects.AddRange(GameObjectNoParentWithTag("Enemy"));
         _gameObjects.AddRange(GameObjectNoParentWithTag("Missile"));
     }
 
@@ -86,12 +92,49 @@ public class MoveToOrigin : MonoBehaviour
         return movePosition;
     }
 
-    void MoveAllObjects(Vector3 addPosition)
+    void MoveAllObjects(Vector3 offset)
     {
         foreach (GameObject go in _gameObjects)
         {
             if (go.transform != null)
-                go.transform.position += addPosition;
+                go.transform.position += offset;
+        }
+    }
+
+    void MoveAllParticles(Vector3 offset)
+    {
+        foreach (ParticleSystem ps in FindObjectsOfType<ParticleSystem>())
+        {
+            if (ps.main.simulationSpace != ParticleSystemSimulationSpace.World)
+                continue;
+ 
+            int particlesNeeded = ps.main.maxParticles;
+ 
+            if (particlesNeeded <= 0)
+                continue;
+
+            bool wasPaused = ps.isPaused;
+            bool wasPlaying = ps.isPlaying;
+
+            if (!wasPaused)
+                ps.Pause();
+ 
+            if (_particles == null || _particles.Length < particlesNeeded)
+            {
+                _particles = new ParticleSystem.Particle[particlesNeeded];
+            }
+ 
+            int num = ps.GetParticles(_particles);
+ 
+            for (int i = 0; i < num; i++)
+            {
+                _particles[i].position += offset;
+            }
+
+            ps.SetParticles(_particles, num);
+
+            if (wasPlaying)
+                ps.Play();
         }
     }
 }
