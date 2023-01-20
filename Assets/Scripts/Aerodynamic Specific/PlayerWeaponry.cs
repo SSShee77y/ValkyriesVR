@@ -40,11 +40,39 @@ public class PlayerWeaponry : MonoBehaviour
         }
     }
     [SerializeField]
+    private float radarScanAngle;
+    [SerializeField]
+    private float radarScanRange;
+
+    [SerializeField]
+    private int maxEnemiesToSwitch;
+
+    [SerializeField]
     private List<WeaponryList> _aircraftWeaponsList = new List<WeaponryList>();
 
     private int _currentIndex = 0;
     private ParticleSystem _mainGun;
     private Rigidbody _rb;
+
+    public class Enemy
+    {
+        public GameObject gameObject;
+        public float distanceToPlayer;
+        public float angleToPlayer;
+
+        public Enemy(GameObject go, float d, float a)
+        {
+            gameObject = go;
+            distanceToPlayer = d;
+            angleToPlayer = a;
+        }
+    }
+
+    private List<Enemy> _enemiesList = new List<Enemy>();
+    public List<Enemy> EnemiesList => _enemiesList;
+
+    private GameObject _currentEnemy;
+    public GameObject CurrentEnemy => _currentEnemy;
 
     void Start()
     {
@@ -66,7 +94,15 @@ public class PlayerWeaponry : MonoBehaviour
 
     void FixedUpdate()
     {
-        
+        if (_currentEnemy == null || GetIndexOfCurrentEnemy() < 0)
+        {
+            SetNextEnemy();
+        }
+    }
+
+    void LateUpdate()
+    {
+        UpdateEnemiesList();
     }
 
     float GetFowardVelocity()
@@ -112,6 +148,72 @@ public class PlayerWeaponry : MonoBehaviour
         }
         iterations = -1;
         return iterations;
+    }    
+
+    void UpdateEnemiesList()
+    {
+        _enemiesList.Clear();
+        GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
+
+        foreach (GameObject go in gos)
+        {
+            if (DistanceToPlayer(go.transform) <= Mathf.Abs(radarScanRange) && AngleToPlayer(go.transform) <= radarScanAngle / 2f)
+            {
+                _enemiesList.Add(new Enemy(go, DistanceToPlayer(go.transform), AngleToPlayer(go.transform)));
+            }
+        }
+
+        _enemiesList.Sort(delegate(Enemy x, Enemy y)
+        {
+            return x.angleToPlayer.CompareTo(y.angleToPlayer);
+        } );
+    }
+
+    float AngleToPlayer(Transform enemyTransform)
+    {
+        Vector3 angleToPlayer = (enemyTransform.position - _rb.transform.position).normalized;
+        return Vector3.Angle(angleToPlayer, _rb.transform.forward);
+    }
+
+    float DistanceToPlayer(Transform enemyTransform)
+    {
+        return Vector3.Distance(enemyTransform.position, _rb.transform.position);
+    }
+
+    GameObject GetNextEnemy()
+    {
+        if (_enemiesList.Count == 0)
+            return null;
+
+        if (_currentEnemy == null)
+            return _enemiesList[0].gameObject;
+
+        int indexOfCurrentEnemy = GetIndexOfCurrentEnemy();
+        if (indexOfCurrentEnemy >= maxEnemiesToSwitch - 1 || indexOfCurrentEnemy < 0)
+            return _enemiesList[0].gameObject;
+        
+        if (_enemiesList.Count > indexOfCurrentEnemy + 1)
+            return _enemiesList[indexOfCurrentEnemy + 1].gameObject;
+        
+        return _enemiesList[0].gameObject;
+    }
+
+    public int GetIndexOfCurrentEnemy()
+    {
+        if (_currentEnemy == null)
+            return -1;
+
+        for (int i = 0; i < _enemiesList.Count; i++)
+        {
+            if (_currentEnemy == _enemiesList[i].gameObject)
+                return i;
+        }
+        return -1;
+    }
+
+    public void SetNextEnemy()
+    {
+        _currentEnemy = GetNextEnemy();
     }
 
     [ContextMenu("FireWeapon")]
@@ -144,6 +246,7 @@ public class PlayerWeaponry : MonoBehaviour
                 if (weapon.count > 0 && weapon.gameObject != null && weapon.gameObject.GetComponent<MissileController>() != null)
                 {
                     weapon.gameObject.GetComponent<MissileController>().ActivateMissile();
+                    if (_currentEnemy != null) weapon.gameObject.GetComponent<MissileController>().SetTarget(_currentEnemy);
                     weapon.gameObject = null;
                     weapon.count--;
                     return;

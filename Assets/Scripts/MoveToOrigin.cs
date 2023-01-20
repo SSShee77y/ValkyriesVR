@@ -55,7 +55,7 @@ public class MoveToOrigin : MonoBehaviour
     {
         while (_gameObjects.Count > nonMissileCount)
         {
-            //_gameObjects.RemoveAt(_gameObjects.Count - 1);
+            _gameObjects.RemoveAt(_gameObjects.Count - 1);
         }
         _gameObjects.AddRange(GameObjectNoParentWithTag("Missile"));
     }
