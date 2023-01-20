@@ -2071,7 +2071,7 @@ ParticleSystem:
         m_RotationOrder: 4
     inWorldSpace: 0
   InheritVelocityModule:
-    enabled: 1
+    enabled: 0
     m_Mode: 0
     m_Curve:
       serializedVersion: 2
@@ -4817,6 +4817,10 @@ PrefabInstance:
       value: ParticleExplosionSmall
       objectReference: {fileID: 0}
     - target: {fileID: 4527228361036179453, guid: 3e655beaafde1084bbbbe6bde4e64b64, type: 3}
+      propertyPath: stopAction
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4527228361036179453, guid: 3e655beaafde1084bbbbe6bde4e64b64, type: 3}
       propertyPath: InitialModule.startSize.scalar
       value: 4
       objectReference: {fileID: 0}
@@ -4866,23 +4870,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7395148963347154227, guid: 3e655beaafde1084bbbbe6bde4e64b64, type: 3}
       propertyPath: InitialModule.startSize.scalar
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7395148963347154227, guid: 3e655beaafde1084bbbbe6bde4e64b64, type: 3}
       propertyPath: InitialModule.startSize.minScalar
-      value: 4
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7395148963347154227, guid: 3e655beaafde1084bbbbe6bde4e64b64, type: 3}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 7395148963347154227, guid: 3e655beaafde1084bbbbe6bde4e64b64, type: 3}
       propertyPath: InitialModule.startColor.maxColor.b
-      value: 0.688
+      value: 0.504
       objectReference: {fileID: 0}
     - target: {fileID: 7395148963347154227, guid: 3e655beaafde1084bbbbe6bde4e64b64, type: 3}
       propertyPath: InitialModule.startColor.maxColor.g
-      value: 0.688
+      value: 0.504
       objectReference: {fileID: 0}
     - target: {fileID: 7395148963347154227, guid: 3e655beaafde1084bbbbe6bde4e64b64, type: 3}
       propertyPath: InitialModule.startColor.maxColor.r
-      value: 0.688
+      value: 0.504
+      objectReference: {fileID: 0}
+    - target: {fileID: 7395148963347154227, guid: 3e655beaafde1084bbbbe6bde4e64b64, type: 3}
+      propertyPath: InitialModule.startLifetime.minScalar
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7395148963347154227, guid: 3e655beaafde1084bbbbe6bde4e64b64, type: 3}
+      propertyPath: EmissionModule.m_Bursts.Array.data[0].countCurve.scalar
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3e655beaafde1084bbbbe6bde4e64b64, type: 3}

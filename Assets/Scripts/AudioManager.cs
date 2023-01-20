@@ -32,6 +32,7 @@ public class AudioManager : MonoBehaviour {
             s.source.volume = s.volume;
             s.source.pitch = s.pitch;
             s.source.spatialBlend = 1f; // 0.0 for 2D, 1.0 for 3D
+            s.source.dopplerLevel = 0; // 0 to prevent audio bugs when moving position fast
             s.source.loop = s.loop;
         }
     }

@@ -59,6 +59,7 @@ public class MissileController : Aerodynamics
         {
             gameObject.transform.parent = null;
             _rb.constraints = RigidbodyConstraints.None;
+            _rb.useGravity = true;
             if (_target == null) _lifeTime -= Time.fixedDeltaTime;
 
             ApplyDragLift();
@@ -198,6 +199,7 @@ public class MissileController : Aerodynamics
             {
                 gameObject.transform.parent = null;
                 _rb.constraints = RigidbodyConstraints.None;
+                _rb.useGravity = true;
                 _rb.velocity = parentRigidbody.velocity;
                 return;
             }
@@ -211,6 +213,7 @@ public class MissileController : Aerodynamics
         if (isActive && _launchAudio != null) _launchAudio.Play();
         gameObject.transform.parent = null;
         _rb.constraints = RigidbodyConstraints.None;
+        _rb.useGravity = true;
         _rb.velocity = withVelocity;
     }
 

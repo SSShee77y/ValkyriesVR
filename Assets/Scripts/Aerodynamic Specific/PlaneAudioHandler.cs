@@ -16,7 +16,7 @@ public class PlaneAudioHandler : AudioManager
     void Update()
     {
         Play("Wind");
-        SetVolume("Wind", _rb.velocity.magnitude / 100f);
+        SetVolume("Wind", Mathf.Sqrt(_rb.velocity.magnitude) / 100f);
 
         if (_ac.CurrentEngineSpeed > 1)
         {

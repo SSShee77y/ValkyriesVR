@@ -5424,7 +5424,7 @@ MonoBehaviour:
   _startingSpeed: 0
   _thrustFactor: 40
   _currentEngineSpeed: 0
-  _engineIncreaseSpeed: 1
+  _engineIncreaseSpeed: 0.5
   _dragFactor: 1
   _maxFacingArea: 200
   _fowardAreaFactor: 0.0025
@@ -8995,6 +8995,10 @@ PrefabInstance:
     - target: {fileID: 965171368686028682, guid: 4d3f5cdd939f74c498838e89953706cf, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2418034344749492193, guid: 4d3f5cdd939f74c498838e89953706cf, type: 3}
+      propertyPath: InheritVelocityModule.m_Mode
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2418034344749492198, guid: 4d3f5cdd939f74c498838e89953706cf, type: 3}
       propertyPath: m_Name

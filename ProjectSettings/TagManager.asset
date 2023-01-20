@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Ally
   - Enemy
+  - Missile
+  - Terrain
   layers:
   - Default
   - TransparentFX
