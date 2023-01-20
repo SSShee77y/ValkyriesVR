@@ -11637,8 +11637,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2418034344749492193, guid: 4d3f5cdd939f74c498838e89953706cf, type: 3}
-      propertyPath: InheritVelocityModule.m_Mode
-      value: 1
+      propertyPath: ShapeModule.angle
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 2418034344749492198, guid: 4d3f5cdd939f74c498838e89953706cf, type: 3}
       propertyPath: m_Name

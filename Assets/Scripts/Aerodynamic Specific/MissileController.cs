@@ -29,6 +29,9 @@ public class MissileController : Aerodynamics
         if (_activated == true)
         {
             Instantiate(_explosion, other.contacts[0].point, this.transform.rotation);
+            HealthManager hpManager = other.gameObject.GetComponent<HealthManager>();
+            if (hpManager != null)
+                hpManager.AddToHealth(-120f);
         }
         Destroy(this.gameObject);
     }
