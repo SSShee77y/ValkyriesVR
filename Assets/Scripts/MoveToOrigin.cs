@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MoveToOrigin : MonoBehaviour
 {
@@ -7,8 +8,6 @@ public class MoveToOrigin : MonoBehaviour
     private float moveRange = 1000f;
 
     private GameObject _player;
-    private List<GameObject> _gameObjects = new List<GameObject>();
-    private int _nonTerrainCount;
 
     private ParticleSystem.Particle[] _particles = null;
     
@@ -17,22 +16,10 @@ public class MoveToOrigin : MonoBehaviour
     void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player");
-
-        _gameObjects.AddRange(GameObjectNoParentWithTag("Terrain"));
-        _nonTerrainCount = _gameObjects.Count;
-
-        _gameObjects.Add(_player);
-        _gameObjects.AddRange(GameObjectNoParentWithTag("Ally"));
-        _gameObjects.AddRange(GameObjectNoParentWithTag("Enemy"));
-        _gameObjects.AddRange(GameObjectNoParentWithTag("Missile"));
     }
 
     void Update()
     {
-        /*
-         *  Add particles to move as well
-         */
-        ReAddObjects();
         Vector3 movePositions = CheckPlayerPosition();
         if (!movePositions.Equals(new Vector3()))
         {
@@ -40,33 +27,6 @@ public class MoveToOrigin : MonoBehaviour
             MoveAllObjects(movePositions);
             MoveAllParticles(movePositions);
         }
-    }
-
-    List<GameObject> GameObjectNoParentWithTag(string tag)
-    {
-        List<GameObject> goList = new List<GameObject>();
-        GameObject[] gos = GameObject.FindGameObjectsWithTag(tag);
-        foreach (GameObject go in gos)
-        {
-            if (go.transform.parent == null)
-            {
-                goList.Add(go);
-            }
-        }
-
-        return goList;
-    }
-
-    void ReAddObjects()
-    {
-        while (_gameObjects.Count > _nonTerrainCount)
-        {
-            _gameObjects.RemoveAt(_gameObjects.Count - 1);
-        }
-        _gameObjects.Add(_player);
-        _gameObjects.AddRange(GameObjectNoParentWithTag("Ally"));
-        _gameObjects.AddRange(GameObjectNoParentWithTag("Enemy"));
-        _gameObjects.AddRange(GameObjectNoParentWithTag("Missile"));
     }
 
     Vector3 CheckPlayerPosition()
@@ -97,7 +57,7 @@ public class MoveToOrigin : MonoBehaviour
 
     void MoveAllObjects(Vector3 offset)
     {
-        foreach (GameObject go in _gameObjects)
+        foreach (GameObject go in SceneManager.GetActiveScene().GetRootGameObjects())
         {
             if (go.transform != null)
                 go.transform.position += offset;
