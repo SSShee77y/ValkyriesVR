@@ -106,7 +106,6 @@ public class Aerodynamics : MonoBehaviour
         // Set Angular Drag
         _rb.angularDrag = 1 + dragCoefficient * airDensity * Mathf.Pow(_rb.velocity.magnitude, 2) / 40000;
 
-        Debug.Log(airDensity + " | " + _maxFacingArea + " | " + dragCoefficient + " | " + _dragFactor);
         // Drag Math
         float dragAmount = -1f * Mathf.Pow(_rb.velocity.magnitude, 2) / 2f * airDensity * _maxFacingArea * dragCoefficient * _dragFactor;
         return dragAmount;
