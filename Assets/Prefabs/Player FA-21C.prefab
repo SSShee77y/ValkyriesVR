@@ -7681,7 +7681,7 @@ MonoBehaviour:
     type: 0
     list:
     - gameObject: {fileID: 3760494795225681455}
-      count: 3200
+      count: 2400
   - name: AIM-9
     type: 1
     list:

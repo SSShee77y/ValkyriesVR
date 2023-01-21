@@ -31,7 +31,7 @@ public class Targeting : MonoBehaviour
     void UpdateGunReticle()
     {
         int lockedTargetIndex = _playerWeaponry.GetIndexOfCurrentEnemy();
-        if (lockedTargetIndex < 0)
+        if (_playerWeaponry.GetCurrentWeaponGroup().type != PlayerWeaponry.WeaponryList.Type.GUN || lockedTargetIndex < 0)
         {
             _gunReticle.SetActive(false);
             return;
