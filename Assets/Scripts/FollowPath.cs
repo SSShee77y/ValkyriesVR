@@ -40,6 +40,20 @@ public class FollowPath : MonoBehaviour
         return null;
     }
 
+    public bool Contains(Transform t)
+    {
+        if (t == null) return false;
+
+        Transform[] transforms = GetComponentsInChildren<Transform>();
+
+        for (int i = 0; i < transforms.Length; i++)
+        {
+            if (transforms[i] == t)
+                return true;
+        }
+        return false;
+    }
+
     public Transform GetNextPoint(Transform t)
     {
         if (t == null) return null;

@@ -22,22 +22,42 @@ public class HealthManager : MonoBehaviour
         if (!isDead && _health <= 0)
         {
             isDead = true;
-            if (_deathMaterial != null)
-            {
-                GetComponent<Renderer>().material = _deathMaterial;
-
-                foreach (var childRenderer in GetComponentsInChildren<Renderer>())
-                {
-                    childRenderer.material = _deathMaterial;
-                }
-            }
-
-            if (_deathParticles != null)
-            {
-                Instantiate(_deathParticles, transform.position, transform.rotation);
-            }
-
+            DeActivateAircraft();
+            EnactDeathVisuals();
             Destroy(gameObject, 20);
+        }
+    }
+
+    void EnactDeathVisuals()
+    {
+        if (_deathMaterial != null)
+        {
+            GetComponent<Renderer>().material = _deathMaterial;
+
+            foreach (var childRenderer in GetComponentsInChildren<Renderer>())
+            {
+                childRenderer.material = _deathMaterial;
+            }
+        }
+
+        if (_deathParticles != null)
+        {
+            Instantiate(_deathParticles, transform.position, transform.rotation);
+        }
+    }
+
+    void DeActivateAircraft()
+    {
+        AerodynamicController aeroController = GetComponent<AerodynamicController>();
+        if (aeroController != null)
+        {
+            aeroController.SetEngineThrust(0f);
+            
+            AIPilot autoPilot = GetComponentInChildren<AIPilot>();
+            if (autoPilot != null)
+            {
+                autoPilot.IsEnabled = false;
+            }
         }
     }
 

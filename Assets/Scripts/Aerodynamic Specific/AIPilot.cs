@@ -5,7 +5,8 @@ using UnityEngine;
 public class AIPilot : MonoBehaviour
 {
     [SerializeField]
-    private bool _isEnabled;
+    public bool IsEnabled;
+    
     [SerializeField]
     private FollowPath _flightPath;
     [SerializeField]
@@ -29,24 +30,27 @@ public class AIPilot : MonoBehaviour
     
     void OnDrawGizmos()
     {
-        if (_navPoint != null)
+        if (IsEnabled)
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, _navPoint.position);
+            if (_navPoint != null)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(transform.position, _navPoint.position);
+            }
+            else if (_flightPath != null)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(transform.position, _flightPath.GetFirstPoint().position);
+            }
         }
-        else if (_flightPath != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, _flightPath.GetFirstPoint().position);
-        }
-        
     }
 
     void Start()
     {
         if (_flightPath != null)
         {
-            _navPoint = _flightPath.GetFirstPoint();
+            if (_flightPath.Contains(_navPoint) == false)
+                _navPoint = _flightPath.GetFirstPoint();
         }
 
         List<AerodynamicController.ControlSurface.SurfaceType> neededSurfaceTypes = new List<AerodynamicController.ControlSurface.SurfaceType>();
@@ -65,7 +69,7 @@ public class AIPilot : MonoBehaviour
 
     void Update()
     {
-        if (_isEnabled)
+        if (IsEnabled)
         {
             CheckPosition();
             RotatePlaneToLocation();
@@ -74,7 +78,8 @@ public class AIPilot : MonoBehaviour
         {
             foreach (AerodynamicController.ControlSurface cs in _controlSurfaces)
             {
-                cs.transform.GetComponent<RotationTransformConstrainer>().SetActive(true);
+                if (cs.transform.GetComponent<RotationTransformConstrainer>() != null)
+                    cs.transform.GetComponent<RotationTransformConstrainer>().SetActive(true);
             }
         }
         
@@ -116,7 +121,9 @@ public class AIPilot : MonoBehaviour
 
         foreach (AerodynamicController.ControlSurface cs in _controlSurfaces)
         {
-            cs.transform.GetComponent<RotationTransformConstrainer>().SetActive(false);
+            if (cs.transform.GetComponent<RotationTransformConstrainer>() != null)
+                cs.transform.GetComponent<RotationTransformConstrainer>().SetActive(false);
+
             if (cs.surfaceType.Equals(AerodynamicController.ControlSurface.SurfaceType.LeftAileron))
             {
                 float rollAngle = Mathf.Clamp(rollAmount * _maxRollAngle, -_safeRollAngle, _safeRollAngle);

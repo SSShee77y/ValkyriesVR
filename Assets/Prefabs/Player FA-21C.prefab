@@ -2517,16 +2517,19 @@ MonoBehaviour:
     Inverse: 0
     MinAngle: 0
     MaxAngle: 0
+    CustomAxisSource: 0
   _YAxisRotation:
     Constrain: 1
     Inverse: 1
     MinAngle: -45
     MaxAngle: 45
+    CustomAxisSource: 0
   _ZAxisRotation:
     Constrain: 1
     Inverse: 0
     MinAngle: 0
     MaxAngle: 0
+    CustomAxisSource: 0
 --- !u!1 &293421012548855052
 GameObject:
   m_ObjectHideFlags: 0
@@ -2886,7 +2889,7 @@ GameObject:
   - component: {fileID: 6122465308228038558}
   - component: {fileID: 9023938803246416334}
   - component: {fileID: 2655115797323167568}
-  - component: {fileID: 1558636326095003097}
+  - component: {fileID: 1709606401797504661}
   m_Layer: 0
   m_Name: Aileron.L
   m_TagString: Untagged
@@ -2957,7 +2960,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1558636326095003097
+--- !u!114 &1709606401797504661
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2966,7 +2969,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 388196218428953558}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67a65788598bcd54e9911d74be6ec081, type: 3}
+  m_Script: {fileID: 11500000, guid: f13e70b314c0eab42b273463ec69e77f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _isActive: 1
@@ -3373,16 +3376,19 @@ MonoBehaviour:
     Inverse: 0
     MinAngle: -25
     MaxAngle: 25
+    CustomAxisSource: 0
   _YAxisRotation:
     Constrain: 1
     Inverse: 0
     MinAngle: -40
     MaxAngle: 40
+    CustomAxisSource: 0
   _ZAxisRotation:
     Constrain: 1
     Inverse: 0
     MinAngle: -25
     MaxAngle: 25
+    CustomAxisSource: 0
 --- !u!1 &1377904148760976036
 GameObject:
   m_ObjectHideFlags: 0
@@ -7587,7 +7593,7 @@ MonoBehaviour:
   _dragFactor: 1
   _maxFacingArea: 200
   _fowardAreaFactor: 0.005
-  _backwardAreaFactor: 2
+  _backwardAreaFactor: 1
   _upAreaFactor: 1
   _rightAreaFactor: 0.94
   _stallSpeed: 65
@@ -7595,7 +7601,7 @@ MonoBehaviour:
   _throttleControl: {fileID: 7440772887478536051}
   _maximumThrottleDisplacement: 0.1
   _ABIncreaseFactor: 0.1
-  _engineTest: 0
+  ThrottleAlways100: 0
   _controlSurfaces:
   - transform: {fileID: 6519070414714706787}
     surfaceType: 2
@@ -7667,8 +7673,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1d67b28c067bef49a90175001abd263, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radarScanAngle: 120
-  radarScanRange: 8000
+  radarScanAngle: 60
+  radarScanRange: 16000
   maxEnemiesToSwitch: 4
   _aircraftWeaponsList:
   - name: GUN
@@ -7873,16 +7879,19 @@ MonoBehaviour:
     Inverse: 0
     MinAngle: 0
     MaxAngle: 0
+    CustomAxisSource: 0
   _YAxisRotation:
     Constrain: 1
     Inverse: 1
     MinAngle: -45
     MaxAngle: 45
+    CustomAxisSource: 0
   _ZAxisRotation:
     Constrain: 1
     Inverse: 0
     MinAngle: 0
     MaxAngle: 0
+    CustomAxisSource: 0
 --- !u!1 &2050218961508792720
 GameObject:
   m_ObjectHideFlags: 0
@@ -8946,16 +8955,19 @@ MonoBehaviour:
     Inverse: 1
     MinAngle: -30
     MaxAngle: 30
+    CustomAxisSource: 0
   _YAxisRotation:
     Constrain: 1
     Inverse: 0
     MinAngle: -6
     MaxAngle: -6
+    CustomAxisSource: 0
   _ZAxisRotation:
     Constrain: 1
     Inverse: 0
     MinAngle: 0
     MaxAngle: 0
+    CustomAxisSource: 0
 --- !u!1 &4872531896272397207
 GameObject:
   m_ObjectHideFlags: 0
@@ -9391,16 +9403,19 @@ MonoBehaviour:
     Inverse: 1
     MinAngle: -30
     MaxAngle: 30
+    CustomAxisSource: 0
   _YAxisRotation:
     Constrain: 1
     Inverse: 0
     MinAngle: 6
     MaxAngle: 6
+    CustomAxisSource: 0
   _ZAxisRotation:
     Constrain: 1
     Inverse: 0
     MinAngle: 0
     MaxAngle: 0
+    CustomAxisSource: 0
 --- !u!1 &5360235991131952271
 GameObject:
   m_ObjectHideFlags: 0
@@ -10252,7 +10267,7 @@ GameObject:
   - component: {fileID: 1783873091850711293}
   - component: {fileID: 8190742105061980949}
   - component: {fileID: 2646045420120807197}
-  - component: {fileID: 1558636326095003096}
+  - component: {fileID: 2377819237542510522}
   m_Layer: 0
   m_Name: Aileron.R
   m_TagString: Untagged
@@ -10323,7 +10338,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1558636326095003096
+--- !u!114 &2377819237542510522
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10332,7 +10347,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7530633825508604881}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67a65788598bcd54e9911d74be6ec081, type: 3}
+  m_Script: {fileID: 11500000, guid: f13e70b314c0eab42b273463ec69e77f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _isActive: 1

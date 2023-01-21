@@ -132,4 +132,9 @@ public class Aerodynamics : MonoBehaviour
         multiplier *= (angleDifference < 90) ? positiveEffect : negativeEffect;
         return multiplier;
     }
+
+    public void SetEngineThrust(float thrust)
+    {
+        _thrustFactor = thrust;
+    }
 }
