@@ -52,6 +52,7 @@ public class PlayerWeaponry : MonoBehaviour
 
     private int _currentIndex = 0;
     private ParticleSystem _mainGun;
+    public ParticleSystem mainGun => _mainGun;
     private Rigidbody _rb;
 
     public class Enemy
@@ -94,6 +95,7 @@ public class PlayerWeaponry : MonoBehaviour
 
     void FixedUpdate()
     {
+        CheckWeaponryStatus();
         if (_currentEnemy == null || GetIndexOfCurrentEnemy() < 0)
         {
             SetNextEnemy();
@@ -119,6 +121,22 @@ public class PlayerWeaponry : MonoBehaviour
                 _mainGun = weaponsList.list[0].gameObject.GetComponent<ParticleSystem>();
                 var particleEmission = _mainGun.emission;
                 particleEmission.enabled = false;
+            }
+        }
+    }
+
+    void CheckWeaponryStatus()
+    {
+        WeaponryList currentList = _aircraftWeaponsList[_currentIndex];
+
+        if (currentList.type != WeaponryList.Type.GUN)
+        {
+            foreach (WeaponryList.Weaponry weapon in currentList.list)
+            {
+                if (weapon.count > 0 && weapon.gameObject == null)
+                {
+                    weapon.count = 0;
+                }
             }
         }
     }
@@ -159,7 +177,11 @@ public class PlayerWeaponry : MonoBehaviour
         {
             if (DistanceToPlayer(go.transform) <= Mathf.Abs(radarScanRange) && AngleToPlayer(go.transform) <= radarScanAngle / 2f)
             {
-                _enemiesList.Add(new Enemy(go, DistanceToPlayer(go.transform), AngleToPlayer(go.transform)));
+                HealthManager hpManager = go.gameObject.GetComponent<HealthManager>();
+                if (hpManager == null)
+                    _enemiesList.Add(new Enemy(go, DistanceToPlayer(go.transform), AngleToPlayer(go.transform)));
+                else if (hpManager.GetHealth() > 0)
+                    _enemiesList.Add(new Enemy(go, DistanceToPlayer(go.transform), AngleToPlayer(go.transform)));
             }
         }
 
@@ -243,6 +265,10 @@ public class PlayerWeaponry : MonoBehaviour
         {
             foreach (WeaponryList.Weaponry weapon in currentList.list)
             {
+                if (weapon.count > 0 && weapon.gameObject == null)
+                {
+                    weapon.count = 0;
+                }
                 if (weapon.count > 0 && weapon.gameObject != null && weapon.gameObject.GetComponent<MissileController>() != null)
                 {
                     weapon.gameObject.GetComponent<MissileController>().ActivateMissile();

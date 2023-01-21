@@ -11,6 +11,8 @@ public class MoveToOrigin : MonoBehaviour
     private int _nonTerrainCount;
 
     private ParticleSystem.Particle[] _particles = null;
+    
+    public float HeightDisplacement = 0;
 
     void Start()
     {
@@ -34,6 +36,7 @@ public class MoveToOrigin : MonoBehaviour
         Vector3 movePositions = CheckPlayerPosition();
         if (!movePositions.Equals(new Vector3()))
         {
+            HeightDisplacement -= movePositions.y;
             MoveAllObjects(movePositions);
             MoveAllParticles(movePositions);
         }
@@ -113,11 +116,11 @@ public class MoveToOrigin : MonoBehaviour
             if (particlesNeeded <= 0)
                 continue;
 
-            bool wasPaused = ps.isPaused;
-            bool wasPlaying = ps.isPlaying;
+            // bool wasPaused = ps.isPaused;
+            // bool wasPlaying = ps.isPlaying;
 
-            if (!wasPaused)
-                ps.Pause();
+            // if (!wasPaused)
+            //     ps.Pause();
  
             if (_particles == null || _particles.Length < particlesNeeded)
             {
@@ -133,8 +136,8 @@ public class MoveToOrigin : MonoBehaviour
 
             ps.SetParticles(_particles, num);
 
-            if (wasPlaying)
-                ps.Play();
+            // if (wasPlaying)
+            //     ps.Play();
         }
     }
 }

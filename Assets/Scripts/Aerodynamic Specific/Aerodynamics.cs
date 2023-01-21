@@ -84,7 +84,8 @@ public class Aerodynamics : MonoBehaviour
 
     protected virtual float DragAmountMath()
     {
-        float airDensity = Mathf.Pow(1.1068f, 2f - 0.788f * Mathf.Pow(transform.position.y / 1000f, 1.15f)); // Close approximation
+        float heightDisplacement = FindObjectOfType<MoveToOrigin>().HeightDisplacement;
+        float airDensity = Mathf.Pow(1.1068f, 2f - 0.788f * Mathf.Pow((heightDisplacement + transform.position.y) / 1000f, 1.15f)); // Close approximation
         
         // Drag Coefficient Formula
         float dragCoefficient = 1.63f;
@@ -95,7 +96,7 @@ public class Aerodynamics : MonoBehaviour
         else if (_rb.velocity.magnitude >= 408)
         {
             dragCoefficient = (float) (2.2674 - 0.0000025 * Mathf.Pow((_rb.velocity.magnitude - 408), 2));
-            if (dragCoefficient < 2) dragCoefficient = 2;
+            if (dragCoefficient < 2) dragCoefficient = 2f;
         }
         else
         {
@@ -105,8 +106,9 @@ public class Aerodynamics : MonoBehaviour
         // Set Angular Drag
         _rb.angularDrag = 1 + dragCoefficient * airDensity * Mathf.Pow(_rb.velocity.magnitude, 2) / 40000;
 
+        Debug.Log(airDensity + " | " + _maxFacingArea + " | " + dragCoefficient + " | " + _dragFactor);
         // Drag Math
-        float dragAmount = -1 * Mathf.Pow(_rb.velocity.magnitude, 2) / 2 * airDensity * _maxFacingArea * dragCoefficient * _dragFactor;
+        float dragAmount = -1f * Mathf.Pow(_rb.velocity.magnitude, 2) / 2f * airDensity * _maxFacingArea * dragCoefficient * _dragFactor;
         return dragAmount;
     }
 

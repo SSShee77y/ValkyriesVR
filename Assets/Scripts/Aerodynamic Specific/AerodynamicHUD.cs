@@ -91,7 +91,7 @@ public class AerodynamicHUD : MonoBehaviour
     void UpdateTextIndicators()
     {
         speedometer.text = string.Format("{0:#,0.} kt", rb.velocity.magnitude * 1.94384f);
-        altimeter.text = string.Format("{0:#,0.} ft", rb.transform.position.y * 3.28084f);
+        altimeter.text = string.Format("{0:#,0.} ft", (FindObjectOfType<MoveToOrigin>().HeightDisplacement + rb.transform.position.y) * 3.28084f);
         heading.text = string.Format("{0:#,0.}", rb.transform.eulerAngles.y);
         AoaMachG.text = string.Format("{0:#,0.0}\n{1:#,0.00}\n{2:#,0.0}", GetAngleOfAttack(), rb.velocity.magnitude / 343f, GetGForces());
         weaponry.text = string.Format("{0}\n{1:#,0.}", _pw.GetCurrentWeaponGroup().name, _pw.GetCurrentWeaponGroup().TotalCount());

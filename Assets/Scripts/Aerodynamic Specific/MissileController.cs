@@ -145,6 +145,7 @@ public class MissileController : Aerodynamics
         float multiplier = Mathf.Sin(angleDifference * Mathf.Deg2Rad) + 0.001f;
         return multiplier;
     }
+    
     Vector3 PredictedTargetPosition()
     {
         float timeFromTarget = Vector3.Distance(transform.position, _target.transform.position) / _rb.velocity.magnitude;

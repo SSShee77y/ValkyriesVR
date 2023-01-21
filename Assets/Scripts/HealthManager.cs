@@ -14,7 +14,7 @@ public class HealthManager : MonoBehaviour
     private bool isDead;
 
     void OnParticleCollision(GameObject other) {
-        if (other.name == "M61 Vulcan") _health -= 5;
+        if (other.name == "M61 Vulcan") _health -= 10;
     }
 
     void Update()
@@ -24,12 +24,11 @@ public class HealthManager : MonoBehaviour
             isDead = true;
             if (_deathMaterial != null)
             {
-                foreach (var renderer in GetComponentsInChildren<Renderer>())
+                GetComponent<Renderer>().material = _deathMaterial;
+
+                foreach (var childRenderer in GetComponentsInChildren<Renderer>())
                 {
-                    for (int i = 0; i < renderer.materials.Length; i++)
-                    {
-                        renderer.materials[i] = _deathMaterial;
-                    }
+                    childRenderer.material = _deathMaterial;
                 }
             }
 
@@ -38,13 +37,17 @@ public class HealthManager : MonoBehaviour
                 Instantiate(_deathParticles, transform.position, transform.rotation);
             }
 
-            gameObject.tag = "Untagged";
-            Destroy(gameObject, 10);
+            Destroy(gameObject, 20);
         }
     }
 
     public void AddToHealth(float hp)
     {
         _health += hp;
+    }
+
+    public float GetHealth()
+    {
+        return _health;
     }
 }
