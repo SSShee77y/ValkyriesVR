@@ -115,7 +115,7 @@ public class AIPilot : MonoBehaviour
             if (relativeDisplacement.y < relativeVelocity.y) relativeVerticleAngle *= -1f;
 
             rollAmount = Mathf.Sin(relativeHorizontalAngle);
-            pitchAmount = (rollAmount < Mathf.Sin(_neededRollAngleForPitch * Mathf.Deg2Rad)) ? ((relativeVerticleAngle < 90) ? Mathf.Sin(relativeVerticleAngle * Mathf.Deg2Rad) : 1f) : 0f;
+            pitchAmount = (Mathf.Abs(relativeHorizontalAngle) < _neededRollAngleForPitch * Mathf.Deg2Rad) ? ((relativeVerticleAngle < 90) ? Mathf.Sin(relativeVerticleAngle * Mathf.Deg2Rad) : 1f) : 0f;
             if (relativeDisplacement.z < 0) pitchAmount = 1f;
         }
 

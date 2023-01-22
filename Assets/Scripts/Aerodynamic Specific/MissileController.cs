@@ -5,11 +5,17 @@ public class MissileController : Aerodynamics
 {
     [Header("Missile Specific Settings")]
     [SerializeField]
-    private float _turnFactor = 10f;
+    private float _maxTurnAngle = 5f;
+    [SerializeField]
+    private float _safeTurnAngle = 3f;
+    [SerializeField]
+    private float _timeBeforeFiring = 1f;
+    [SerializeField]
+    private float _trackingWaitTimeAfterFire = 0.5f;
     [SerializeField]
     private float _fuelTime = 2.5f;
     [SerializeField]
-    private float _lifeTime = 60f;
+    private float _lifeTime = 10f;
     [SerializeField]
     private int _missileAccuracy = 4;
     [SerializeField]
@@ -18,10 +24,23 @@ public class MissileController : Aerodynamics
     private GameObject _explosion;
 
     private bool _activated;
+    private float _timeWhenActivated;
     private ParticleSystem _particles;
     private Vector3 _targetPreviousVelocity;
     private AudioSource _launchAudio;
+    private float _lastDistanceFromObject;
     
+    void OnDrawGizmos()
+    {
+        if (_activated == true && _target != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(transform.position, transform.position + _rb.velocity);
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, PredictedTargetPosition());
+        }
+    }
+
     void OnCollisionEnter(Collision other)
     {
         _rb.velocity = new Vector3();
@@ -58,12 +77,16 @@ public class MissileController : Aerodynamics
 
     protected override void FixedUpdate()
     {
-        if (_activated == true)
+        if (_target != null)
         {
-            gameObject.transform.parent = null;
+            _lifeTime = Mathf.Clamp(_lifeTime, -1f, 1.5f);
+        }
+        if (_activated == true && _timeBeforeFiring <= 0)
+        {
             _rb.constraints = RigidbodyConstraints.None;
             _rb.useGravity = true;
-            if (_target == null) _lifeTime -= Time.fixedDeltaTime;
+            if (_target == null || (_target != null && _lastDistanceFromObject < Vector3.Distance(_target.transform.position, transform.position)))
+                _lifeTime -= Time.fixedDeltaTime;
 
             ApplyDragLift();
 
@@ -82,9 +105,18 @@ public class MissileController : Aerodynamics
         {
             ParticleEnabled(false);
         }
-        if (_lifeTime <= 0) {
+        if (_activated == true && _timeBeforeFiring > -_trackingWaitTimeAfterFire)
+        {
+            _timeBeforeFiring -= Time.fixedDeltaTime;
+        }
+        if (_lifeTime <= 0)
+        {
             DetachParticles();
             Destroy(this.gameObject);
+        }
+        if (_target != null)
+        {
+            _lastDistanceFromObject = Vector3.Distance(_target.transform.position, transform.position);
         }
     }
 
@@ -107,36 +139,45 @@ public class MissileController : Aerodynamics
 
     protected override void AdditionalDragMethods(float dragAmount)
     {
-        if (_target != null) RotateTowardsTarget(dragAmount);
+        if (_target != null && _timeBeforeFiring <= -_trackingWaitTimeAfterFire) RotateTowardsTarget(dragAmount);
     }
 
     void RotateTowardsTarget(float dragAmount)
     {
-        Vector3 neededVelocity = RequiredVelocity();
+        Vector3 predictedTargetPosition = PredictedTargetPosition();
+        Vector3 relativeDisplacement = GetRelativeDisplacement(predictedTargetPosition - transform.position);
+        Vector3 relativeVelocity = GetRelativeDisplacement(_rb.velocity);
 
-        Vector3 velocityPosition = new Vector3();
+        float relativeHorizontalAngle = Mathf.Atan((relativeDisplacement.x - relativeVelocity.x) / relativeVelocity.z);
 
-        velocityPosition = (neededVelocity - _rb.velocity);
+        float relativeVerticleAngle = Mathf.Atan((relativeDisplacement.y - relativeVelocity.y) / relativeVelocity.z);
 
-        Vector3 newDirection = Vector3.Normalize(velocityPosition);
-
-        Vector3 positionDifference = (PredictedTargetPosition() - transform.position);
-
-        if (Vector3.Angle(new Vector3(positionDifference.normalized.x, 0, positionDifference.normalized.z), new Vector3(transform.forward.x, 0, transform.forward.z)) <= 15)
+        float horizontalAmount = Mathf.Sin(relativeHorizontalAngle);
+        float verticalAmount = Mathf.Sin(relativeVerticleAngle);
+        if (relativeDisplacement.z < 0)
         {
-            if (Mathf.Abs(positionDifference.x) < Mathf.Abs(positionDifference.z))
-                newDirection.z *= 0;
-            else if (Mathf.Abs(positionDifference.x) > Mathf.Abs(positionDifference.z))
-                newDirection.x *= 0;
-        } else {
-            newDirection = positionDifference.normalized;
+            if (relativeVerticleAngle < 0)
+                verticalAmount = -1f;
+            else
+                verticalAmount = 1f;
         }
-            
-        float turnMultiplier = TurnMultiplier(neededVelocity.normalized);
 
-        Quaternion rotation = Quaternion.LookRotation(newDirection);
+        float yawAmount = Mathf.Clamp(horizontalAmount * _maxTurnAngle, -_safeTurnAngle, _safeTurnAngle) * (Mathf.Sqrt(relativeVelocity.z) / 25f);
+        float pitchAmount = Mathf.Clamp(verticalAmount * _maxTurnAngle, -_safeTurnAngle, _safeTurnAngle) * (Mathf.Sqrt(relativeVelocity.z) / 25f);
 
-        transform.localRotation = Quaternion.Slerp(Quaternion.LookRotation(transform.forward), rotation, turnMultiplier * _turnFactor * Time.fixedDeltaTime);
+        Debug.Log(horizontalAmount + " | " + verticalAmount);
+
+        transform.eulerAngles += new Vector3(-pitchAmount, yawAmount, 0);
+    }
+
+    Vector3 GetRelativeDisplacement(Vector3 displacement)
+    {
+        Vector3 relativeDisplacement = new Vector3();
+        relativeDisplacement.z = Vector3.Dot(displacement, transform.forward);
+        relativeDisplacement.y = Vector3.Dot(displacement, transform.up);
+        relativeDisplacement.x = Vector3.Dot(displacement, transform.right);
+
+        return relativeDisplacement;
     }
 
     float TurnMultiplier(Vector3 direction)
@@ -171,17 +212,6 @@ public class MissileController : Aerodynamics
         return predictedPosition;
     }
 
-    Vector3 RequiredVelocity()
-    {
-        Vector3 predictedPosition = PredictedTargetPosition();
-        
-        float timeFromTarget = Vector3.Distance(transform.position, predictedPosition) / _rb.velocity.magnitude;
-        
-        Vector3 requiredVelocity = (predictedPosition - transform.position) / timeFromTarget;
-
-        return requiredVelocity;
-    }
-
     [ContextMenu("ActivateMissile")]
     public void ActivateMissile()
     {
@@ -194,11 +224,10 @@ public class MissileController : Aerodynamics
         RemoveFixedJoint();
         if (isActive && _launchAudio != null) _launchAudio.Play();
         GameObject currentObject = gameObject;
-        Rigidbody parentRigidbody = new Rigidbody();
-        while (currentObject.transform.parent.gameObject != null)
+        while (currentObject.transform.parent != null)
         {
             currentObject = currentObject.transform.parent.gameObject;
-            parentRigidbody = currentObject.GetComponent<Rigidbody>();
+            Rigidbody parentRigidbody = currentObject.GetComponent<Rigidbody>();
             if (parentRigidbody != null)
             {
                 gameObject.transform.parent = null;
@@ -233,6 +262,5 @@ public class MissileController : Aerodynamics
     {
         _target = target;
     }
-
     
 }
