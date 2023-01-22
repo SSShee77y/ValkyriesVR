@@ -134,8 +134,8 @@ public class AIPilot : MonoBehaviour
                 cs.transform.localEulerAngles = new Vector3(-rollAngle, cs.transform.localEulerAngles.y, cs.transform.localEulerAngles.z);
             }
             else if (cs.surfaceType.Equals(AerodynamicController.ControlSurface.SurfaceType.Elevator))
-            {   float rollAngle = Mathf.Clamp(pitchAmount * _maxRollAngle, -_safeRollAngle, _safeRollAngle);
-                cs.transform.localEulerAngles = new Vector3(rollAngle, cs.transform.localEulerAngles.y, cs.transform.localEulerAngles.z);
+            {   float pitchAngle = Mathf.Clamp(pitchAmount * _maxPitchAngle, -_safePitchAngle, _safePitchAngle);
+                cs.transform.localEulerAngles = new Vector3(pitchAngle, cs.transform.localEulerAngles.y, cs.transform.localEulerAngles.z);
             }
         }
     }

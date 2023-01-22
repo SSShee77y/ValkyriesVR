@@ -79,7 +79,7 @@ public class MissileController : Aerodynamics
     {
         if (_target != null)
         {
-            _lifeTime = Mathf.Clamp(_lifeTime, -1f, 1.5f);
+            _lifeTime = Mathf.Clamp(_lifeTime, -1f, 1.6f);
         }
         if (_activated == true && _timeBeforeFiring <= 0)
         {
@@ -175,9 +175,10 @@ public class MissileController : Aerodynamics
 
         Debug.Log(string.Format("{0}, {1} | {2}, {3}", relativeHorizontalAngle, relativeVerticleAngle, horizontalAmount, verticalAmount));
         
-        float maxClampAngles = Mathf.Clamp(0.2f + relativeAngle / 10f, 0.2f, _safeTurnAngle);
-        float yawAmount = Mathf.Clamp(horizontalAmount * _maxTurnAngle, -maxClampAngles, maxClampAngles);
-        float pitchAmount = Mathf.Clamp(verticalAmount * _maxTurnAngle, -maxClampAngles, maxClampAngles);
+        float safeHorizontalAngle = Mathf.Clamp(0.2f + Mathf.Abs(relativeHorizontalAngle / 10f), 0.1f, _safeTurnAngle);
+        float safeVerticleAngle = Mathf.Clamp(0.2f + Mathf.Abs(relativeVerticleAngle / 10f) , 0.1f, _safeTurnAngle);
+        float yawAmount = Mathf.Clamp(horizontalAmount * _maxTurnAngle, -safeHorizontalAngle, safeHorizontalAngle);
+        float pitchAmount = Mathf.Clamp(verticalAmount * _maxTurnAngle, -safeVerticleAngle, safeVerticleAngle);
 
         transform.localEulerAngles += new Vector3(-pitchAmount, yawAmount, 0);
     }
@@ -190,13 +191,6 @@ public class MissileController : Aerodynamics
         relativeDisplacement.x = Vector3.Dot(displacement, transform.right);
 
         return relativeDisplacement;
-    }
-
-    float TurnMultiplier(Vector3 direction)
-    {
-        float angleDifference = Vector3.Angle(direction, transform.forward);
-        float multiplier = Mathf.Sin(angleDifference * Mathf.Deg2Rad) + 0.001f;
-        return multiplier;
     }
     
     Vector3 PredictedTargetPosition()

@@ -128,7 +128,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startingSpeed: 0
-  _thrustFactor: 400
+  _thrustFactor: 250
   _currentEngineSpeed: 0
   _engineIncreaseSpeed: 10
   _dragFactor: 1
@@ -141,8 +141,8 @@ MonoBehaviour:
   _safeTurnAngle: 2
   _timeBeforeFiring: 0.02
   _trackingWaitTimeAfterFire: 0.1
-  _fuelTime: 2.5
-  _lifeTime: 15
+  _fuelTime: 4.8
+  _lifeTime: 10
   _missileAccuracy: 5
   _target: {fileID: 0}
   _explosion: {fileID: 4527228361036179331, guid: ebfcda185c255064599a6185088762cf, type: 3}

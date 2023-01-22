@@ -51,7 +51,7 @@ MonoBehaviour:
   _maxRollAngle: 30
   _safeRollAngle: 8
   _maxPitchAngle: 30
-  _safePitchAngle: 12
+  _safePitchAngle: 10
   _neededRollAngleForPitch: 60
 --- !u!1 &655967127730976962
 GameObject:
