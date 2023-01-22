@@ -14,7 +14,7 @@ public class HealthManager : MonoBehaviour
     private bool isDead;
 
     void OnParticleCollision(GameObject other) {
-        if (other.name == "M61 Vulcan") _health -= 10;
+        if (other.name == "M61 Vulcan") _health -= 20;
     }
 
     void Update()

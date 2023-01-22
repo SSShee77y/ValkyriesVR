@@ -148,26 +148,38 @@ public class MissileController : Aerodynamics
         Vector3 relativeDisplacement = GetRelativeDisplacement(predictedTargetPosition - transform.position);
         Vector3 relativeVelocity = GetRelativeDisplacement(_rb.velocity);
 
-        float relativeHorizontalAngle = Mathf.Atan((relativeDisplacement.x - relativeVelocity.x) / relativeVelocity.z);
+        float relativeAngle = Vector3.Angle(relativeDisplacement, Vector3.Normalize(relativeVelocity));
 
-        float relativeVerticleAngle = Mathf.Atan((relativeDisplacement.y - relativeVelocity.y) / relativeVelocity.z);
-
-        float horizontalAmount = Mathf.Sin(relativeHorizontalAngle);
-        float verticalAmount = Mathf.Sin(relativeVerticleAngle);
-        if (relativeDisplacement.z < 0)
+        if (relativeAngle >= 15f)
         {
-            if (relativeVerticleAngle < 0)
-                verticalAmount = -1f;
-            else
-                verticalAmount = 1f;
+            Quaternion newRotation = Quaternion.LookRotation((predictedTargetPosition - transform.position).normalized);
+            transform.localRotation = Quaternion.Slerp(transform.rotation, newRotation, _safeTurnAngle * Time.fixedDeltaTime);
+            return;
         }
 
-        float yawAmount = Mathf.Clamp(horizontalAmount * _maxTurnAngle, -_safeTurnAngle, _safeTurnAngle) * (Mathf.Sqrt(relativeVelocity.z) / 25f);
-        float pitchAmount = Mathf.Clamp(verticalAmount * _maxTurnAngle, -_safeTurnAngle, _safeTurnAngle) * (Mathf.Sqrt(relativeVelocity.z) / 25f);
+        Vector3 displacementNoY = new Vector3(relativeDisplacement.x, 0, relativeDisplacement.z);
+        Vector3 velocityNoY = new Vector3(relativeVelocity.x, 0, relativeVelocity.z);
+        Vector3 displacementNoX = new Vector3(0, relativeDisplacement.y, relativeDisplacement.z);
+        Vector3 velocityNoX = new Vector3(0, relativeVelocity.y, relativeVelocity.z);
 
-        Debug.Log(horizontalAmount + " | " + verticalAmount);
+        float relativeHorizontalAngle = Vector3.Angle(displacementNoY, Vector3.Normalize(velocityNoY));
+        if (displacementNoY.normalized.x < velocityNoY.normalized.x)
+            relativeHorizontalAngle *= -1f;
 
-        transform.eulerAngles += new Vector3(-pitchAmount, yawAmount, 0);
+        float relativeVerticleAngle = Vector3.Angle(displacementNoX, Vector3.Normalize(velocityNoX));
+        if (displacementNoX.normalized.y < velocityNoX.normalized.y)
+            relativeVerticleAngle *= -1f;
+
+        float horizontalAmount = Mathf.Sin(relativeHorizontalAngle * Mathf.Deg2Rad);
+        float verticalAmount = Mathf.Sin(relativeVerticleAngle * Mathf.Deg2Rad);
+
+        Debug.Log(string.Format("{0}, {1} | {2}, {3}", relativeHorizontalAngle, relativeVerticleAngle, horizontalAmount, verticalAmount));
+        
+        float maxClampAngles = Mathf.Clamp(0.2f + relativeAngle / 10f, 0.2f, _safeTurnAngle);
+        float yawAmount = Mathf.Clamp(horizontalAmount * _maxTurnAngle, -maxClampAngles, maxClampAngles);
+        float pitchAmount = Mathf.Clamp(verticalAmount * _maxTurnAngle, -maxClampAngles, maxClampAngles);
+
+        transform.localEulerAngles += new Vector3(-pitchAmount, yawAmount, 0);
     }
 
     Vector3 GetRelativeDisplacement(Vector3 displacement)
