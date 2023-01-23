@@ -3,15 +3,15 @@ using UnityEngine;
 public abstract class Objective : MonoBehaviour
 {
     [SerializeField]
-    protected string title;
+    protected string _title;
     
     [SerializeField] [TextArea]
-    protected string description;
+    protected string _description;
 
     [SerializeField]
-    protected Objective nextObjective;
+    protected Objective _nextObjective;
     
-    protected bool objectiveFinished;
+    protected bool _objectiveFinished;
 
     protected abstract void FinishObjective();
 

@@ -11,6 +11,7 @@ public class MoveToOrigin : MonoBehaviour
 
     private ParticleSystem.Particle[] _particles = null;
     
+    [HideInInspector]
     public float HeightDisplacement = 0;
 
     void Start()

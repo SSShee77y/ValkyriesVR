@@ -24,7 +24,7 @@ public class TransformValueReached : ValueReached
 
     protected override void FinishObjective()
     {
-        objectiveFinished = true;
+        _objectiveFinished = true;
     }
 
     protected override bool IsValueReached()

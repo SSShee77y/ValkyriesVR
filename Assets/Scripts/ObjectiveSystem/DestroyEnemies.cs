@@ -16,7 +16,7 @@ public class DestroyEnemies : Objective
 
     protected override void FinishObjective()
     {
-        objectiveFinished = true;
+        _objectiveFinished = true;
     }
 
 }
