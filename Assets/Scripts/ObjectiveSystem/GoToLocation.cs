@@ -11,6 +11,9 @@ public class GoToLocation : Objective
     [SerializeField]
     private float _withinRange = 50f;
 
+    [SerializeField]
+    private GameObject _waypointRing;
+
     private int _currentPoints = 0;
     private int _totalPointsNeeded = 0;
 
@@ -28,8 +31,10 @@ public class GoToLocation : Objective
         }
     }
 
-    void Start()
+    protected override void Start()
     {
+        base.Start();
+        
         if (_flightPath != null)
         {
             if (_flightPath.Contains(_navPoint) == false)
@@ -57,14 +62,26 @@ public class GoToLocation : Objective
         {
             FinishObjective();
         }
+
+        if (_waypointRing != null) UpdateWaypointRing();
     }
 
-    protected override void FinishObjective()
+    void UpdateWaypointRing()
     {
-        _objectiveFinished = true;
-        if (_nextObjective != null)
-            _nextObjective.gameObject.SetActive(false);
-        gameObject.SetActive(false);
+        if (_navPoint == null)
+        {
+            _waypointRing.SetActive(false);
+            return;
+        }
+        _waypointRing.SetActive(true);
+        _waypointRing.transform.position = _navPoint.position;
+        Vector3 relativePos = _player.position - _waypointRing.transform.position;
+        _waypointRing.transform.rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+    }
+
+    public override void FinishObjective()
+    {
+        base.FinishObjective();
     }
 
     bool IsWithinRange()

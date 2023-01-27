@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class Objective : MonoBehaviour
+public class Objective : MonoBehaviour
 {
     [SerializeField]
     protected string _title;
@@ -13,6 +13,32 @@ public abstract class Objective : MonoBehaviour
     
     protected bool _objectiveFinished;
 
-    protected abstract void FinishObjective();
+    private ObjectiveEvents _objectiveEvents;
+
+    protected virtual void Start()
+    {
+        _objectiveEvents = GetComponent<ObjectiveEvents>();
+        if (_objectiveEvents != null) _objectiveEvents.InvokeEnableObjEvent();
+    }
+
+    public virtual void FinishObjective()
+    {
+        _objectiveFinished = true;
+        if (_objectiveEvents != null) _objectiveEvents.InvokeCompleteObjEvent();
+        
+        if (_nextObjective != null)
+            _nextObjective.gameObject.SetActive(true);
+        gameObject.SetActive(false);
+    }
+
+    public virtual string GetTitle()
+    {
+        return _title;
+    }
+
+    public virtual string GetDescription()
+    {
+        return _description;
+    }
 
 }

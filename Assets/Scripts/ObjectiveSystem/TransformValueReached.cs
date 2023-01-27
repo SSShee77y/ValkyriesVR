@@ -11,8 +11,9 @@ public class TransformValueReached : ValueReached
     [SerializeField]
     private Vector3 maxVectorValue;
 
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         base.objectiveComponent = objectiveComponent;
     }
 
@@ -22,9 +23,9 @@ public class TransformValueReached : ValueReached
             FinishObjective();
     }
 
-    protected override void FinishObjective()
+    public override void FinishObjective()
     {
-        _objectiveFinished = true;
+        base.FinishObjective();
     }
 
     protected override bool IsValueReached()
