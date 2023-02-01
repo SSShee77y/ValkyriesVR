@@ -32,11 +32,13 @@ public class HealthManager : MonoBehaviour
     {
         if (_deathMaterial != null)
         {
-            GetComponent<Renderer>().material = _deathMaterial;
-
-            foreach (var childRenderer in GetComponentsInChildren<Renderer>())
+            foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
             {
-                childRenderer.material = _deathMaterial;
+                Material[] deathMaterials = new Material[renderer.materials.Length];
+                for (int j = 0; j < deathMaterials.Length; ++j) {
+                    deathMaterials[j] = _deathMaterial;
+                }
+                renderer.materials = deathMaterials;
             }
         }
 

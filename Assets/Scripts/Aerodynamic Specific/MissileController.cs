@@ -5,9 +5,9 @@ public class MissileController : Aerodynamics
 {
     [Header("Missile Specific Settings")]
     [SerializeField]
-    private float _maxTurnAngle = 5f;
+    private float _turnAngleMultiplier = 8f;
     [SerializeField]
-    private float _safeTurnAngle = 3f;
+    private float _maxTurnAngle = 2f;
     [SerializeField]
     private float _timeBeforeFiring = 1f;
     [SerializeField]
@@ -85,14 +85,14 @@ public class MissileController : Aerodynamics
         {
             _rb.constraints = RigidbodyConstraints.None;
             _rb.useGravity = true;
-            if (_target == null || (_target != null && _lastDistanceFromObject < Vector3.Distance(_target.transform.position, transform.position)))
-                _lifeTime -= Time.fixedDeltaTime;
 
             ApplyDragLift();
 
             if (_fuelTime <= 0f)
             {
                 ParticleEnabled(false);
+                if (_target == null || (_target != null && _lastDistanceFromObject < Vector3.Distance(_target.transform.position, transform.position)))
+                    _lifeTime -= Time.fixedDeltaTime;
             }
             else
             {   
@@ -150,35 +150,34 @@ public class MissileController : Aerodynamics
 
         float relativeAngle = Vector3.Angle(relativeDisplacement, Vector3.Normalize(relativeVelocity));
 
-        if (relativeAngle >= 15f)
-        {
-            Quaternion newRotation = Quaternion.LookRotation((predictedTargetPosition - transform.position).normalized);
-            transform.localRotation = Quaternion.Slerp(transform.rotation, newRotation, _safeTurnAngle * Time.fixedDeltaTime);
-            return;
-        }
-
         Vector3 displacementNoY = new Vector3(relativeDisplacement.x, 0, relativeDisplacement.z);
         Vector3 velocityNoY = new Vector3(relativeVelocity.x, 0, relativeVelocity.z);
         Vector3 displacementNoX = new Vector3(0, relativeDisplacement.y, relativeDisplacement.z);
         Vector3 velocityNoX = new Vector3(0, relativeVelocity.y, relativeVelocity.z);
 
-        float relativeHorizontalAngle = Vector3.Angle(displacementNoY, Vector3.Normalize(velocityNoY));
-        if (displacementNoY.normalized.x < velocityNoY.normalized.x)
+        float relativeHorizontalAngle = Vector3.Angle(displacementNoY, velocityNoY);
+        if (Vector3.Cross(velocityNoY, displacementNoY).y > 0)
+        {
             relativeHorizontalAngle *= -1f;
+        }
 
-        float relativeVerticleAngle = Vector3.Angle(displacementNoX, Vector3.Normalize(velocityNoX));
-        if (displacementNoX.normalized.y < velocityNoX.normalized.y)
+        float relativeVerticleAngle = Vector3.Angle(displacementNoX, velocityNoX);
+        if (Vector3.Cross(velocityNoX, displacementNoX).x < 0)
+        {
             relativeVerticleAngle *= -1f;
+        }
+
+        Debug.Log(string.Format("{0}, {1}", Vector3.Cross(velocityNoY, displacementNoY), Vector3.Cross(velocityNoX, displacementNoX)));
 
         float horizontalAmount = Mathf.Sin(relativeHorizontalAngle * Mathf.Deg2Rad);
         float verticalAmount = Mathf.Sin(relativeVerticleAngle * Mathf.Deg2Rad);
 
         Debug.Log(string.Format("{0}, {1} | {2}, {3}", relativeHorizontalAngle, relativeVerticleAngle, horizontalAmount, verticalAmount));
         
-        float safeHorizontalAngle = Mathf.Clamp(0.2f + Mathf.Abs(relativeHorizontalAngle / 10f), 0.1f, _safeTurnAngle);
-        float safeVerticleAngle = Mathf.Clamp(0.2f + Mathf.Abs(relativeVerticleAngle / 10f) , 0.1f, _safeTurnAngle);
-        float yawAmount = Mathf.Clamp(horizontalAmount * _maxTurnAngle, -safeHorizontalAngle, safeHorizontalAngle);
-        float pitchAmount = Mathf.Clamp(verticalAmount * _maxTurnAngle, -safeVerticleAngle, safeVerticleAngle);
+        float safeHorizontalAngle = Mathf.Clamp(0.2f + Mathf.Abs(relativeHorizontalAngle / 10f), 0.1f, _maxTurnAngle);
+        float safeVerticleAngle = Mathf.Clamp(0.2f + Mathf.Abs(relativeVerticleAngle / 10f) , 0.1f, _maxTurnAngle);
+        float yawAmount = Mathf.Clamp(horizontalAmount * _turnAngleMultiplier, -safeHorizontalAngle, safeHorizontalAngle);
+        float pitchAmount = Mathf.Clamp(verticalAmount * _turnAngleMultiplier, -safeVerticleAngle, safeVerticleAngle);
 
         transform.localEulerAngles += new Vector3(-pitchAmount, yawAmount, 0);
     }

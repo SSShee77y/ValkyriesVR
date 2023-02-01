@@ -137,8 +137,8 @@ MonoBehaviour:
   _backwardAreaFactor: 0.8
   _upAreaFactor: 0.6
   _rightAreaFactor: 0.6
-  _maxTurnAngle: 8
-  _safeTurnAngle: 2
+  _turnAngleMultiplier: 8
+  _maxTurnAngle: 1.2
   _timeBeforeFiring: 0.02
   _trackingWaitTimeAfterFire: 0.1
   _fuelTime: 4.8
