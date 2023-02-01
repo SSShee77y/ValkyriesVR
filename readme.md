@@ -1,10 +1,10 @@
 # ValkyriesVR
 A VR aircraft simulation game made with Unity and Oculus SDK. You will need an Oculus / Meta device to play.
 
-### Current Release Version: 0.1.0
+### Current Release Version: 0.1.1
 
 #### Mechanics needed to be implemented / updated:
-- Improved missile tracking
+- Implement explosion / shrapnel damage system
 - Active AI (ally and enemy)
 - More interactions (flares / chaff, MFD functionality, auto-pilot, etc.)
 - Menu scene / briefing room
