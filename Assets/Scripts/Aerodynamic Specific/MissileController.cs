@@ -156,13 +156,13 @@ public class MissileController : Aerodynamics
         Vector3 velocityNoX = new Vector3(0, relativeVelocity.y, relativeVelocity.z);
 
         float relativeHorizontalAngle = Vector3.Angle(displacementNoY, velocityNoY);
-        if (Vector3.Cross(velocityNoY, displacementNoY).y > 0)
+        if (Vector3.Cross(velocityNoY, displacementNoY).y < 0)
         {
             relativeHorizontalAngle *= -1f;
         }
 
         float relativeVerticleAngle = Vector3.Angle(displacementNoX, velocityNoX);
-        if (Vector3.Cross(velocityNoX, displacementNoX).x < 0)
+        if (Vector3.Cross(velocityNoX, displacementNoX).x > 0)
         {
             relativeVerticleAngle *= -1f;
         }
