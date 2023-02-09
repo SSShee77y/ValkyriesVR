@@ -354,6 +354,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2670881742496427277, guid: 002c01ba95e64324bb6f4d3a765ace98, type: 3}
+      propertyPath: _deathParticles
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5777639147962382601, guid: 002c01ba95e64324bb6f4d3a765ace98, type: 3}
       propertyPath: m_RootOrder
       value: 9
@@ -2022,6 +2026,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2670881742496427277, guid: 002c01ba95e64324bb6f4d3a765ace98, type: 3}
+      propertyPath: _deathParticles
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5777639147962382601, guid: 002c01ba95e64324bb6f4d3a765ace98, type: 3}
       propertyPath: m_RootOrder
       value: 10
@@ -2307,6 +2315,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2670881742496427277, guid: 002c01ba95e64324bb6f4d3a765ace98, type: 3}
+      propertyPath: _deathParticles
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5777639147962382601, guid: 002c01ba95e64324bb6f4d3a765ace98, type: 3}
       propertyPath: m_RootOrder
       value: 8

@@ -827,7 +827,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _health: 100
-  _deathParticles: {fileID: 0}
+  _deathParticles: {fileID: 5319860812964226158, guid: 555a08f6aa6d2a242b19a577cb3f7823, type: 3}
   _deathMaterial: {fileID: 2100000, guid: e6d20c077e4347f409730b0aa767f120, type: 2}
 --- !u!1 &6988289867328127084
 GameObject:
