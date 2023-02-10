@@ -66,6 +66,7 @@ public class HealthManager : MonoBehaviour
         if (aeroController != null)
         {
             aeroController.SetEngineThrust(0f);
+            aeroController.SetFowardDragFactor(1.0f);
             
             AIPilot autoPilot = GetComponentInChildren<AIPilot>();
             if (autoPilot != null)
