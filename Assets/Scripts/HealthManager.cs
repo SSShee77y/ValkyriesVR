@@ -10,11 +10,22 @@ public class HealthManager : MonoBehaviour
     private GameObject _deathParticles;
     [SerializeField]
     private Material _deathMaterial;
+
+    private GameObject _deathParticleRef = null;
     
     private bool isDead;
 
     void OnParticleCollision(GameObject other) {
         if (other.name == "M61 Vulcan") _health -= 20;
+    }
+
+    void DetachParticles() {
+        if(_deathParticleRef != null) {
+            var particleEmission = _deathParticleRef.GetComponent<ParticleSystem>().emission;
+            particleEmission.enabled = false;
+            _deathParticleRef.transform.parent = null;
+            Destroy(_deathParticleRef.transform.gameObject, 5.0f);
+        }
     }
 
     void Update()
@@ -24,7 +35,8 @@ public class HealthManager : MonoBehaviour
             isDead = true;
             DeActivateAircraft();
             EnactDeathVisuals();
-            Destroy(gameObject, 20);
+            Invoke("DetachParticles", 19.9f);
+            Destroy(gameObject, 20.0f);
         }
     }
 
@@ -44,7 +56,7 @@ public class HealthManager : MonoBehaviour
 
         if (_deathParticles != null)
         {
-            Instantiate(_deathParticles, transform.position, transform.rotation);
+            _deathParticleRef = Instantiate(_deathParticles, transform);
         }
     }
 
@@ -54,6 +66,7 @@ public class HealthManager : MonoBehaviour
         if (aeroController != null)
         {
             aeroController.SetEngineThrust(0f);
+            aeroController.SetFowardDragFactor(1.0f);
             
             AIPilot autoPilot = GetComponentInChildren<AIPilot>();
             if (autoPilot != null)

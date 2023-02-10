@@ -137,4 +137,9 @@ public class Aerodynamics : MonoBehaviour
     {
         _thrustFactor = thrust;
     }
+
+    public void SetFowardDragFactor(float dragAmount)
+    {
+        _fowardAreaFactor = dragAmount;
+    }
 }

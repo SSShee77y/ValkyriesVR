@@ -144,6 +144,8 @@ public class MissileController : Aerodynamics
 
     void RotateTowardsTarget(float dragAmount)
     {
+        transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, transform.localEulerAngles.y, 0);
+
         Vector3 predictedTargetPosition = PredictedTargetPosition();
         Vector3 relativeDisplacement = GetRelativeDisplacement(predictedTargetPosition - transform.position);
         Vector3 relativeVelocity = GetRelativeDisplacement(_rb.velocity);
