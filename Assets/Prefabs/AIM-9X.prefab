@@ -138,9 +138,9 @@ MonoBehaviour:
   _upAreaFactor: 0.6
   _rightAreaFactor: 0.6
   _turnAngleMultiplier: 6
-  _maxTurnAngle: 1
+  _maxTurnAngle: 1.2
   _timeBeforeFiring: 0.02
-  _trackingWaitTimeAfterFire: 0.5
+  _trackingWaitTimeAfterFire: 0.4
   _fuelTime: 4.8
   _lifeTime: 10
   _missileAccuracy: 5

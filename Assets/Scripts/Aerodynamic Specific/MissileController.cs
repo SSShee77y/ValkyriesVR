@@ -196,7 +196,9 @@ public class MissileController : Aerodynamics
     
     Vector3 PredictedTargetPosition()
     {
-        float timeFromTarget = Vector3.Distance(transform.position, _target.transform.position) / _rb.velocity.magnitude;
+        float velocityMagnitude = (_fuelTime > 0.1f) ? Mathf.Max(680f, _rb.velocity.magnitude) : _rb.velocity.magnitude;
+
+        float timeFromTarget = Vector3.Distance(transform.position, _target.transform.position) / velocityMagnitude;
 
         Vector3 predictedPosition = _target.transform.position;
 
@@ -210,7 +212,7 @@ public class MissileController : Aerodynamics
             }
             for (int i = 0; i < _missileAccuracy; i++)
             {
-                timeFromTarget = Vector3.Distance(transform.position, predictedPosition) / _rb.velocity.magnitude;
+                timeFromTarget = Vector3.Distance(transform.position, predictedPosition) / velocityMagnitude;
 
                 predictedPosition = _target.transform.position + (timeFromTarget * _target.GetComponent<Rigidbody>().velocity) + (.5f * Mathf.Pow(timeFromTarget, 2) * acceleration);
             }
