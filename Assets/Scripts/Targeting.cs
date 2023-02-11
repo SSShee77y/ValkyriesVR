@@ -16,6 +16,10 @@ public class Targeting : MonoBehaviour
     [SerializeField]
     private GameObject _referenceTargetBox;
     [SerializeField]
+    private GameObject _missileLeadIndicator;
+    [SerializeField]
+    public float AverageMissileSpeed = 680f;
+    [SerializeField]
     private Transform _hudGlassLocation;
     
     private List<GameObject> _targetBoxList = new List<GameObject>();
@@ -26,6 +30,26 @@ public class Targeting : MonoBehaviour
         UpdateTargetBox();
         UpdateTargetLockBox();
         UpdateGunReticle();
+        UpdateMissileLeadIndicator();
+    }
+
+    void UpdateMissileLeadIndicator()
+    {
+        int lockedTargetIndex = _playerWeaponry.GetIndexOfCurrentEnemy();
+        if (_playerWeaponry.GetCurrentWeaponGroup().type == PlayerWeaponry.WeaponryList.Type.GUN || lockedTargetIndex < 0)
+        {
+            _missileLeadIndicator.SetActive(false);
+            return;
+        }
+
+        var enemy = _playerWeaponry.EnemiesList[lockedTargetIndex].gameObject;
+        _missileLeadIndicator.SetActive(true);
+
+        Vector3 predictedTargetLocation = PredictedTargetPosition(enemy.transform, _hudGlassLocation, AverageMissileSpeed);
+
+        Vector3 displacement = (predictedTargetLocation - _hudGlassLocation.position);
+        _missileLeadIndicator.GetComponent<RectTransform>().anchoredPosition = DisplacementToAnchorPosition(displacement);
+
     }
 
     void UpdateGunReticle()
@@ -47,7 +71,8 @@ public class Targeting : MonoBehaviour
 
         _gunReticle.SetActive(true);
 
-        Vector3 predictedTargetLocation = PredictedTargetPosition(enemy.transform, _hudGlassLocation);
+        float gunSpeed = _playerWeaponry.mainGun.main.startSpeedMultiplier;
+        Vector3 predictedTargetLocation = PredictedTargetPosition(enemy.transform, _hudGlassLocation, gunSpeed);
         distance = Vector3.Distance(predictedTargetLocation, _hudGlassLocation.position);
 
         float timeFromTarget = distance / _playerWeaponry.mainGun.main.startSpeedMultiplier;
@@ -63,10 +88,9 @@ public class Targeting : MonoBehaviour
 
     }
 
-    Vector3 PredictedTargetPosition(Transform target, Transform player)
+    Vector3 PredictedTargetPosition(Transform target, Transform player, float inputSpeed)
     {
-        float gunSpeed = _playerWeaponry.mainGun.main.startSpeedMultiplier;
-        float timeFromTarget = Vector3.Distance(player.position, target.position) / gunSpeed;
+        float timeFromTarget = Vector3.Distance(player.position, target.position) / inputSpeed;
 
         Vector3 predictedPosition = target.position;
 
@@ -74,7 +98,7 @@ public class Targeting : MonoBehaviour
         {
             for (int i = 0; i < 3; i++)
             {
-                timeFromTarget = Vector3.Distance(player.position, predictedPosition) / gunSpeed;
+                timeFromTarget = Vector3.Distance(player.position, predictedPosition) / inputSpeed;
 
                 predictedPosition = target.position + (timeFromTarget * target.GetComponent<Rigidbody>().velocity);
             }
@@ -82,6 +106,7 @@ public class Targeting : MonoBehaviour
 
         return predictedPosition;
     }
+
     Vector2 DisplacementToAnchorPosition(Vector3 displacement)
     {
         Vector3 relativeDisplacement = new Vector3();
