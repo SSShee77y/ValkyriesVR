@@ -8996,7 +8996,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8534741352860465209, guid: 45bfb80608c899d4ea6a178e4b785592, type: 3}
       propertyPath: _maxTurnAngle
-      value: 6
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 8534741352860465209, guid: 45bfb80608c899d4ea6a178e4b785592, type: 3}
       propertyPath: _safeTurnAngle

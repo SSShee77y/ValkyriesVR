@@ -7,7 +7,7 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 1
     path: Assets/Scenes/FlightTest.unity
-    guid: 1fc04d80f5be55041a77f230bab2a0c5
+    guid: e8e6005bef46c374eb0546a8e8534d8d
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 1b6ef1deaa4d8534d9a0fb51b180f9a2, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 261fb8273240376439b77c1a7d670e33, type: 2}
