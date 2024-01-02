@@ -51,6 +51,7 @@ public class PlayerWeaponry : MonoBehaviour
 
     [SerializeField]
     private List<WeaponryList> _aircraftWeaponsList = new List<WeaponryList>();
+    public List<WeaponryList> WeaponsList => _aircraftWeaponsList;
 
     private int _currentIndex = 0;
     private ParticleSystem _mainGun;
@@ -86,13 +87,16 @@ public class PlayerWeaponry : MonoBehaviour
 
     void Update()
     {
-        var mainGun = _mainGun.main;
-        mainGun.startSpeedMultiplier = GetFowardVelocity() + 1000f;
-        
-        if (_mainGun.emission.enabled == true && GetList(WeaponryList.Type.GUN).TotalCount() > 0)
-            _aircraftWeaponsList[GetListIndex(WeaponryList.Type.GUN)].list[0].count -= _mainGun.emission.rateOverTimeMultiplier * Time.fixedDeltaTime;
-        else if (_mainGun.emission.enabled == true)
-            EnableMainGun(false);
+        if (GetList(WeaponryList.Type.GUN) != null)
+        {
+            var mainGun = _mainGun.main;
+            mainGun.startSpeedMultiplier = GetFowardVelocity() + 1000f;
+            
+            if (_mainGun.emission.enabled == true && GetList(WeaponryList.Type.GUN).TotalCount() > 0)
+                _aircraftWeaponsList[GetListIndex(WeaponryList.Type.GUN)].list[0].count -= _mainGun.emission.rateOverTimeMultiplier * Time.fixedDeltaTime;
+            else if (_mainGun.emission.enabled == true)
+                EnableMainGun(false);
+        }
     }
 
     void FixedUpdate()
