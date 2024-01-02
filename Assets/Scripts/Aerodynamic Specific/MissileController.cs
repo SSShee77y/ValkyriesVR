@@ -13,6 +13,8 @@ public class MissileController : Aerodynamics
     [SerializeField]
     private float _trackingWaitTimeAfterFire = 0.5f;
     [SerializeField]
+    private float _trackingAngle = 80f;
+    [SerializeField]
     private float _fuelTime = 2.5f;
     [SerializeField]
     private float _lifeTime = 10f;
@@ -20,10 +22,12 @@ public class MissileController : Aerodynamics
     private int _missileAccuracy = 4;
     [SerializeField]
     private GameObject _target;
+    public GameObject Target => _target;
     [SerializeField]
     private GameObject _explosion;
 
     private bool _activated;
+    public bool Activated => _activated;
     private float _timeWhenActivated;
     private ParticleSystem _particles;
     private Vector3 _targetPreviousVelocity;
@@ -86,13 +90,29 @@ public class MissileController : Aerodynamics
             _rb.constraints = RigidbodyConstraints.None;
             _rb.useGravity = true;
 
+            if (_target != null)
+            {
+                // If angle is more than the tracking angle, lose the target
+                float angleBetween = Vector3.Angle(transform.forward, (_target.transform.position - transform.position).normalized);
+                if (angleBetween >= _trackingAngle)
+                {
+                    _target = null;
+                }
+            }
+            else
+            {
+                // implement code to heat seak new target or explode, idk
+            }
+
             ApplyDragLift();
 
             if (_fuelTime <= 0f)
             {
                 ParticleEnabled(false);
                 if (_target == null || (_target != null && _lastDistanceFromObject < Vector3.Distance(_target.transform.position, transform.position)))
+                {
                     _lifeTime -= Time.fixedDeltaTime;
+                }
             }
             else
             {   
@@ -169,12 +189,12 @@ public class MissileController : Aerodynamics
             relativeVerticleAngle *= -1f;
         }
 
-        Debug.Log(string.Format("{0}, {1}", Vector3.Cross(velocityNoY, displacementNoY), Vector3.Cross(velocityNoX, displacementNoX)));
+        // Debug.Log(string.Format("{0}, {1}", Vector3.Cross(velocityNoY, displacementNoY), Vector3.Cross(velocityNoX, displacementNoX)));
 
         float horizontalAmount = Mathf.Sin(relativeHorizontalAngle * Mathf.Deg2Rad);
         float verticalAmount = Mathf.Sin(relativeVerticleAngle * Mathf.Deg2Rad);
 
-        Debug.Log(string.Format("{0}, {1} | {2}, {3}", relativeHorizontalAngle, relativeVerticleAngle, horizontalAmount, verticalAmount));
+        // Debug.Log(string.Format("{0}, {1} | {2}, {3}", relativeHorizontalAngle, relativeVerticleAngle, horizontalAmount, verticalAmount));
         
         float safeHorizontalAngle = Mathf.Clamp(0.2f + Mathf.Abs(relativeHorizontalAngle / 10f), 0.1f, _maxTurnAngle);
         float safeVerticleAngle = Mathf.Clamp(0.2f + Mathf.Abs(relativeVerticleAngle / 10f) , 0.1f, _maxTurnAngle);

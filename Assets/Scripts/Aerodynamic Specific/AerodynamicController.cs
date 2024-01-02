@@ -38,7 +38,7 @@ public class AerodynamicController : Aerodynamics
     [SerializeField]
     private float _ABIncreaseFactor;
     [SerializeField]
-    public bool ThrottleAlways100 = false;
+    public float ThrottleOverride = 0f;
 
     [SerializeField]
     private List<ControlSurface> _controlSurfaces = new List<ControlSurface>();
@@ -52,8 +52,8 @@ public class AerodynamicController : Aerodynamics
 
     protected override void ApplyThrust()
     {
-        float enginePercentage = 100;
-        if (ThrottleAlways100 == false && _throttleControl != null)
+        float enginePercentage = ThrottleOverride;
+        if (ThrottleOverride == 0 && _throttleControl != null)
             enginePercentage = (_throttleControl.transform.localPosition.z - _minimumThrottleDisplacement) / _maximumThrottleDisplacement * 100;
         if (enginePercentage <= 0)
             enginePercentage = 0;

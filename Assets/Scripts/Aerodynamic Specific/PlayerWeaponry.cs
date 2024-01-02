@@ -45,6 +45,8 @@ public class PlayerWeaponry : MonoBehaviour
     private float radarScanRange;
 
     [SerializeField]
+    private string enemiesTag = "Enemy";
+    [SerializeField]
     private int maxEnemiesToSwitch;
 
     [SerializeField]
@@ -171,7 +173,7 @@ public class PlayerWeaponry : MonoBehaviour
     void UpdateEnemiesList()
     {
         _enemiesList.Clear();
-        GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
+        GameObject[] gos = GameObject.FindGameObjectsWithTag(enemiesTag);
 
         foreach (GameObject go in gos)
         {
@@ -233,9 +235,12 @@ public class PlayerWeaponry : MonoBehaviour
         return -1;
     }
 
-    public void SetNextEnemy()
+    public void SetNextEnemy(int index = -1)
     {
-        _currentEnemy = GetNextEnemy();
+        if (index == -1)
+            _currentEnemy = GetNextEnemy();
+        else
+            _currentEnemy = _enemiesList[index].gameObject;
     }
 
     [ContextMenu("FireWeapon")]
@@ -250,8 +255,9 @@ public class PlayerWeaponry : MonoBehaviour
         FireWeapon(false);
     }
 
-    public void FireWeapon(bool toFire)
+    public Transform FireWeapon(bool toFire, int weaponryIndex = -1)
     {
+        if (weaponryIndex != -1) _currentIndex = weaponryIndex;
         WeaponryList currentList = _aircraftWeaponsList[_currentIndex];
 
         if (currentList.type == WeaponryList.Type.GUN)
@@ -259,7 +265,7 @@ public class PlayerWeaponry : MonoBehaviour
         else
             EnableMainGun(false);
 
-        if (toFire == false) return;
+        if (toFire == false) return null;
 
         if (currentList.type != WeaponryList.Type.GUN)
         {
@@ -273,12 +279,16 @@ public class PlayerWeaponry : MonoBehaviour
                 {
                     weapon.gameObject.GetComponent<MissileController>().ActivateMissile();
                     if (_currentEnemy != null) weapon.gameObject.GetComponent<MissileController>().SetTarget(_currentEnemy);
+                    
+                    Transform firedMissile = weapon.gameObject.transform;
                     weapon.gameObject = null;
                     weapon.count--;
-                    return;
+                    return firedMissile;
                 }
             }
         }
+
+        return null;
     }
 
     public void EnableMainGun(bool isEnabled)

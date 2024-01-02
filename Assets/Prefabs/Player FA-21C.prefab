@@ -1035,6 +1035,7 @@ MonoBehaviour:
   _maxPitchAngle: 30
   _safePitchAngle: 12
   _neededRollAngleForPitch: 60
+  _rollproperlyangle: 10
 --- !u!1 &1202372753
 GameObject:
   m_ObjectHideFlags: 0
@@ -4510,7 +4511,7 @@ MonoBehaviour:
   _throttleControl: {fileID: 7440772887478536051}
   _maximumThrottleDisplacement: 0.1
   _ABIncreaseFactor: 0.2
-  ThrottleAlways100: 0
+  ThrottleOverride: 100
   _controlSurfaces:
   - transform: {fileID: 6519070414714706787}
     surfaceType: 2

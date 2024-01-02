@@ -10,10 +10,13 @@ public class HealthManager : MonoBehaviour
     private GameObject _deathParticles;
     [SerializeField]
     private Material _deathMaterial;
+    [SerializeField]
+    private float _disappearTime = 10f;
 
     private GameObject _deathParticleRef = null;
     
     private bool isDead;
+    public bool IsDead => isDead;
 
     void OnParticleCollision(GameObject other) {
         if (other.name == "M61 Vulcan") _health -= 20;
@@ -35,8 +38,8 @@ public class HealthManager : MonoBehaviour
             isDead = true;
             DeActivateAircraft();
             EnactDeathVisuals();
-            Invoke("DetachParticles", 19.9f);
-            Destroy(gameObject, 20.0f);
+            Invoke("DetachParticles", Mathf.Max(_disappearTime - 0.1f, 0f));
+            Destroy(gameObject, _disappearTime);
         }
     }
 
