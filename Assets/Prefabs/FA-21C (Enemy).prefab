@@ -6706,7 +6706,7 @@ MonoBehaviour:
   _missileCooldown: 1.5
   _missileFireAngle: 30
   _gunFireAngle: 1.5
-  _missileEvasionDistance: 1500
+  _missileEvasionDistance: 2000
 --- !u!1 &6325517010053971675
 GameObject:
   m_ObjectHideFlags: 0

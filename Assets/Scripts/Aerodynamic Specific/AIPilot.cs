@@ -53,11 +53,10 @@ public class AIPilot : MonoBehaviour
     private Transform _currentMissile;
     private Transform _missileAtMe;
     private float _missileShootTimer;
-    private float _randomEvadeValue;
 
     private Color fadedRed = new Color(1,0,0,0.5f);
     private Color fadedWhite = new Color(1,1,1,0.5f);
-    private Color fadedBlue = new Color(0,0,1,0.5f); 
+    private Color fadedBlue = new Color(0,1,1,0.5f); 
     
     void OnDrawGizmos()
     {
@@ -74,6 +73,10 @@ public class AIPilot : MonoBehaviour
                 {
                     Gizmos.color = fadedRed;
                 }
+
+                Gizmos.DrawLine(transform.position, transform.position + transform.forward * 50f);
+                Gizmos.DrawWireSphere(transform.position, 20f);
+                return;
             }
 
             if (_navPoint != null)
@@ -151,7 +154,7 @@ public class AIPilot : MonoBehaviour
 
         if (Evasion() == true)
         {
-            rollAmount = _randomEvadeValue;
+            rollAmount = 10f * Vector3.Dot(transform.up, _missileAtMe.transform.forward) * Mathf.Sign(-Vector3.Dot(transform.right, _missileAtMe.transform.forward));
             pitchAmount = 100f;
         }
 
@@ -294,7 +297,6 @@ public class AIPilot : MonoBehaviour
                     && Vector3.Distance(missile.transform.position, transform.position) < _missileEvasionDistance)
             {
                 _missileAtMe = missile.transform;
-                _randomEvadeValue = Random.Range(-1f, 1f);
                 return true;
             }
         }

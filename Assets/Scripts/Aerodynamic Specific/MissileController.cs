@@ -38,10 +38,10 @@ public class MissileController : Aerodynamics
     {
         if (_activated == true && _target != null)
         {
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(transform.position, transform.position + _rb.velocity);
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, PredictedTargetPosition());
+            Gizmos.color = Color.grey;
+            Gizmos.DrawLine(transform.position, transform.position + _rb.velocity.normalized * 100f);
+            // Gizmos.color = Color.red;
+            // Gizmos.DrawLine(transform.position, PredictedTargetPosition());
         }
     }
 
@@ -218,7 +218,7 @@ public class MissileController : Aerodynamics
     {
         float velocityMagnitude = (_fuelTime > 0.1f) ? Mathf.Max(680f, _rb.velocity.magnitude) : _rb.velocity.magnitude;
 
-        float timeFromTarget = Vector3.Distance(transform.position, _target.transform.position) / velocityMagnitude;
+        float timeFromTarget = Mathf.Min(2f, Vector3.Distance(transform.position, _target.transform.position) / velocityMagnitude);
 
         Vector3 predictedPosition = _target.transform.position;
 
@@ -232,7 +232,7 @@ public class MissileController : Aerodynamics
             }
             for (int i = 0; i < _missileAccuracy; i++)
             {
-                timeFromTarget = Vector3.Distance(transform.position, predictedPosition) / velocityMagnitude;
+                timeFromTarget = Mathf.Min(2f, Vector3.Distance(transform.position, predictedPosition) / velocityMagnitude);
 
                 predictedPosition = _target.transform.position + (timeFromTarget * _target.GetComponent<Rigidbody>().velocity) + (.5f * Mathf.Pow(timeFromTarget, 2) * acceleration);
             }
