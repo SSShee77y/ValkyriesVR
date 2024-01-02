@@ -54,24 +54,34 @@ public class AIPilot : MonoBehaviour
     private Transform _missileAtMe;
     private float _missileShootTimer;
     private float _randomEvadeValue;
+
+    private Color fadedRed = new Color(1,0,0,0.5f);
+    private Color fadedWhite = new Color(1,1,1,0.5f);
+    private Color fadedBlue = new Color(0,0,1,0.5f); 
     
     void OnDrawGizmos()
     {
         if (IsEnabled)
         {
+            Gizmos.color = fadedWhite;
+            if (engageCombat)
+            {
+                if (_aeroController.gameObject.tag.Equals("Ally"))
+                {
+                    Gizmos.color = fadedBlue;
+                }
+                else if (_aeroController.gameObject.tag.Equals("Enemy"))
+                {
+                    Gizmos.color = fadedRed;
+                }
+            }
+
             if (_navPoint != null)
             {
-                Gizmos.color = Color.red;
                 Gizmos.DrawLine(transform.position, _navPoint.position);
-                if (_navPoint.GetComponent<Rigidbody>() != null)
-                {
-                    Gizmos.color = Color.green;
-                    Gizmos.DrawLine(transform.position, PredictedTargetPosition(_navPoint));
-                }
             }
             else if (_flightPath != null)
             {
-                Gizmos.color = Color.red;
                 Gizmos.DrawLine(transform.position, _flightPath.GetFirstPoint().position);
             }
         }
@@ -147,7 +157,11 @@ public class AIPilot : MonoBehaviour
 
         else if (_navPoint != null)
         {
-            Vector3 targetPosition = (_navPoint.GetComponent<Rigidbody>() != null) ? PredictedTargetPosition(_navPoint) : _navPoint.position;
+            Vector3 targetPosition = new Vector3();
+            if (engageCombat)
+                targetPosition = PredictedTargetPosition(_navPoint, _weaponsControl.mainGun.main.startSpeedMultiplier, true);
+            else 
+                targetPosition = PredictedTargetPosition(_navPoint);
         
             // relativeDisplacement = local space displacement vector to target
             // relativeVelocity = local space velocity vector of the place
@@ -230,18 +244,8 @@ public class AIPilot : MonoBehaviour
 
         // Get distance to target and attack angle to target
         float distanceToTarget = Vector3.Distance(_navPoint.transform.position, transform.position);
-        Vector3 targetPosition = (_navPoint.GetComponent<Rigidbody>() != null) ? PredictedTargetPosition(_navPoint) : _navPoint.position;
+        Vector3 targetPosition = PredictedTargetPosition(_navPoint, _weaponsControl.mainGun.main.startSpeedMultiplier, true);
         float angleBetween = Vector3.Angle(transform.forward, (targetPosition - transform.position).normalized);
-
-        // If no target targeted,
-        if (distanceToTarget >= _engagementDistance || angleBetween >= _missileFireAngle)
-        {
-            if (_missileShootTimer < _missileCooldown)
-                _missileShootTimer += Time.deltaTime;
-            else
-                _missileShootTimer = _missileCooldown;
-            return;
-        }
 
         // GUNS GUNS GUNS
         if (angleBetween < _gunFireAngle && distanceToTarget < 1850 && distanceToTarget > 150)
@@ -251,6 +255,16 @@ public class AIPilot : MonoBehaviour
         else
         {
             _weaponsControl.FireWeapon(false, 0);
+        }
+
+        // If no target targeted,
+        if (distanceToTarget >= _engagementDistance || angleBetween >= _missileFireAngle)
+        {
+            if (_missileShootTimer < _missileCooldown)
+                _missileShootTimer += Time.deltaTime;
+            else
+                _missileShootTimer = _missileCooldown;
+            return;
         }
         
         // If missile has not been fired, fire it
@@ -298,20 +312,31 @@ public class AIPilot : MonoBehaviour
         return relativeDisplacement;
     }
 
-    Vector3 PredictedTargetPosition(Transform target)
+    Vector3 PredictedTargetPosition(Transform target, bool useBulletDrop = false)
     {
         float velocityMagnitude = _aeroController.GetComponent<Rigidbody>().velocity.magnitude;
+        return PredictedTargetPosition(target, velocityMagnitude, useBulletDrop);
+    }
 
-        float timeFromTarget = Mathf.Min(2f, Vector3.Distance(transform.position, target.position) / velocityMagnitude);
+    Vector3 PredictedTargetPosition(Transform target, float towardTargetSpeed, bool useBulletDrop = false)
+    {
+        float timeFromTarget = Mathf.Min(2f, Vector3.Distance(transform.position, target.position) / towardTargetSpeed);
+        Vector3 predictedPosition = target.position;
 
-        Vector3 targetVelocity = target.GetComponent<Rigidbody>().velocity;
-
-        Vector3 predictedPosition = target.position + (timeFromTarget * targetVelocity);
-
-        for (int i = 0; i < 5; i++)
+        if (target.GetComponent<Rigidbody>() != null)
         {
-            timeFromTarget = Mathf.Min(1.5f, Vector3.Distance(transform.position, target.position) / velocityMagnitude);
-            predictedPosition = target.position + (timeFromTarget * targetVelocity);
+            Vector3 targetVelocity = target.GetComponent<Rigidbody>().velocity;
+            for (int i = 0; i < 3; i++)
+            {
+                timeFromTarget = Mathf.Min(2f, Vector3.Distance(transform.position, target.position) / towardTargetSpeed);
+                predictedPosition = target.position + (timeFromTarget * targetVelocity);
+            }
+        }
+
+        if (useBulletDrop)
+        {
+            float gravityDisplacement = 9.81f * timeFromTarget;
+            predictedPosition += new Vector3(0, gravityDisplacement, 0);
         }
 
         return predictedPosition;

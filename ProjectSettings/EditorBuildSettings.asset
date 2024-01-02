@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/FlightTest.unity
+    path: Assets/Scenes/AutoPilotTest.unity
     guid: e8e6005bef46c374eb0546a8e8534d8d
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 1b6ef1deaa4d8534d9a0fb51b180f9a2, type: 2}

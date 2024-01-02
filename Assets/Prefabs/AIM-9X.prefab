@@ -137,13 +137,14 @@ MonoBehaviour:
   _backwardAreaFactor: 0.8
   _upAreaFactor: 0.6
   _rightAreaFactor: 0.6
-  _turnAngleMultiplier: 10
-  _maxTurnAngle: 1.2
+  _turnAngleMultiplier: 8
+  _maxTurnAngle: 0.5
   _timeBeforeFiring: 0.02
   _trackingWaitTimeAfterFire: 0.4
+  _trackingAngle: 80
   _fuelTime: 4.8
   _lifeTime: 5
-  _missileAccuracy: 5
+  _missileAccuracy: 3
   _target: {fileID: 0}
   _explosion: {fileID: 4527228361036179331, guid: ebfcda185c255064599a6185088762cf, type: 3}
 --- !u!82 &4071171758218302872
