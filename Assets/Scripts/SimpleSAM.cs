@@ -168,6 +168,7 @@ public class SimpleSAM : MonoBehaviour
             _currentMissile = _weaponsControl.FireWeapon(true, 0);
             if (_isWeaponMissile || _weaponsControl.WeaponsList[0].list[0].count <= 0)
             {
+                _currentMissile.GetComponent<MissileController>().SetTarget(_target.gameObject);
                 Invoke("ReloadWeapon", _weaponReloadTime);
             }
             if (!_isWeaponMissile)
