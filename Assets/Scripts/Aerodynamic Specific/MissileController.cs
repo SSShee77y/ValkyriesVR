@@ -3,6 +3,10 @@ using UnityEngine;
 
 public class MissileController : Aerodynamics
 {
+    [Header("Missile Aero Settings")]
+    [SerializeField]
+    private float _dragRotationSpeed = 0.5f;
+
     [Header("Missile Specific Settings")]
     [SerializeField]
     private float _turnAngleMultiplier = 8f;
@@ -19,29 +23,36 @@ public class MissileController : Aerodynamics
     [SerializeField]
     private float _lifeTime = 10f;
     [SerializeField]
-    private int _missileAccuracy = 4;
-    [SerializeField]
     private GameObject _target;
     public GameObject Target => _target;
     [SerializeField]
     private GameObject _explosion;
 
-    private bool _activated;
-    public bool Activated => _activated;
-    private float _timeWhenActivated;
+    public bool Activated;
+    
+    private Vector3 _lastVelocity;
+    private Vector3 _predictedVelocity;
+
+    private float _timeFromTarget;
+    private Vector3 _predictedTargetLocation;
+    private float _lastDistanceFromObject;
+
     private ParticleSystem _particles;
     private Vector3 _targetPreviousVelocity;
     private AudioSource _launchAudio;
-    private float _lastDistanceFromObject;
+    
     
     void OnDrawGizmos()
     {
-        if (_activated == true && _target != null)
+        if (Activated == true && _target != null)
         {
             Gizmos.color = Color.grey;
             Gizmos.DrawLine(transform.position, transform.position + _rb.velocity.normalized * 100f);
+            // Gizmos.color = Color.blue;
+            // Gizmos.DrawLine(transform.position, transform.position + _predictedVelocity.normalized * 100f);
             // Gizmos.color = Color.red;
-            // Gizmos.DrawLine(transform.position, PredictedTargetPosition());
+            // Gizmos.DrawLine(transform.position, _predictedTargetLocation);
+
         }
     }
 
@@ -49,7 +60,7 @@ public class MissileController : Aerodynamics
     {
         _rb.velocity = new Vector3();
         DetachParticles();
-        if (_activated == true)
+        if (Activated == true)
         {
             Instantiate(_explosion, other.contacts[0].point, this.transform.rotation);
             HealthManager hpManager = other.gameObject.GetComponent<HealthManager>();
@@ -85,7 +96,11 @@ public class MissileController : Aerodynamics
         {
             _lifeTime = Mathf.Clamp(_lifeTime, -1f, 1.6f);
         }
-        if (_activated == true && _timeBeforeFiring <= 0)
+        if (Activated == true)
+        {
+            ApplyDragLift();
+        }
+        if (Activated == true && _timeBeforeFiring <= 0)
         {
             _rb.constraints = RigidbodyConstraints.None;
             _rb.useGravity = true;
@@ -103,8 +118,6 @@ public class MissileController : Aerodynamics
             {
                 // implement code to heat seak new target or explode, idk
             }
-
-            ApplyDragLift();
 
             if (_fuelTime <= 0f)
             {
@@ -125,7 +138,7 @@ public class MissileController : Aerodynamics
         {
             ParticleEnabled(false);
         }
-        if (_activated == true && _timeBeforeFiring > -_trackingWaitTimeAfterFire)
+        if (Activated == true && _timeBeforeFiring > -_trackingWaitTimeAfterFire)
         {
             _timeBeforeFiring -= Time.fixedDeltaTime;
         }
@@ -160,6 +173,12 @@ public class MissileController : Aerodynamics
     protected override void AdditionalDragMethods(float dragAmount)
     {
         if (_target != null && _timeBeforeFiring <= -_trackingWaitTimeAfterFire) RotateTowardsTarget(dragAmount);
+        
+        // Get normalized velocity vector and rotate missle towards direction
+        Vector3 velocityDirection = _rb.velocity.normalized;
+        float anlgeDifference = Vector3.Angle(transform.forward, velocityDirection);
+        Vector3 newDirection = Vector3.RotateTowards(transform.forward, velocityDirection, _dragRotationSpeed * (anlgeDifference / 180) * Time.deltaTime, 0.0f);
+        transform.rotation = Quaternion.LookRotation(newDirection);
     }
 
     void RotateTowardsTarget(float dragAmount)
@@ -168,9 +187,14 @@ public class MissileController : Aerodynamics
 
         Vector3 predictedTargetPosition = PredictedTargetPosition();
         Vector3 relativeDisplacement = GetRelativeDisplacement(predictedTargetPosition - transform.position);
-        Vector3 relativeVelocity = GetRelativeDisplacement(_rb.velocity);
-
-        float relativeAngle = Vector3.Angle(relativeDisplacement, Vector3.Normalize(relativeVelocity));
+        
+        // Estimate predicted velocity angle based on time from target
+        Vector3 acceleration = (_rb.velocity - _lastVelocity) / Time.fixedDeltaTime;
+        _lastVelocity = _rb.velocity;
+        float time = Mathf.Max(0f, 250f / _rb.velocity.magnitude - 0.5f); // yeah i give up, this will work fine
+        Vector3 predictedVelocity = _rb.velocity + acceleration * time;
+        _predictedVelocity = predictedVelocity;
+        Vector3 relativeVelocity = GetRelativeDisplacement(predictedVelocity);
 
         Vector3 displacementNoY = new Vector3(relativeDisplacement.x, 0, relativeDisplacement.z);
         Vector3 velocityNoY = new Vector3(relativeVelocity.x, 0, relativeVelocity.z);
@@ -196,8 +220,8 @@ public class MissileController : Aerodynamics
 
         // Debug.Log(string.Format("{0}, {1} | {2}, {3}", relativeHorizontalAngle, relativeVerticleAngle, horizontalAmount, verticalAmount));
         
-        float safeHorizontalAngle = Mathf.Clamp(0.2f + Mathf.Abs(relativeHorizontalAngle / 10f), 0.1f, _maxTurnAngle);
-        float safeVerticleAngle = Mathf.Clamp(0.2f + Mathf.Abs(relativeVerticleAngle / 10f) , 0.1f, _maxTurnAngle);
+        float safeHorizontalAngle = Mathf.Clamp(0.2f + Mathf.Abs(relativeHorizontalAngle), 0.1f, _maxTurnAngle);
+        float safeVerticleAngle = Mathf.Clamp(0.2f + Mathf.Abs(relativeVerticleAngle) , 0.1f, _maxTurnAngle);
         float yawAmount = Mathf.Clamp(horizontalAmount * _turnAngleMultiplier, -safeHorizontalAngle, safeHorizontalAngle);
         float pitchAmount = Mathf.Clamp(verticalAmount * _turnAngleMultiplier, -safeVerticleAngle, safeVerticleAngle);
 
@@ -216,12 +240,9 @@ public class MissileController : Aerodynamics
     
     Vector3 PredictedTargetPosition()
     {
-        float velocityMagnitude = (_fuelTime > 0.1f) ? Mathf.Max(680f, _rb.velocity.magnitude) : _rb.velocity.magnitude;
-
-        float timeFromTarget = Mathf.Min(2f, Vector3.Distance(transform.position, _target.transform.position) / velocityMagnitude);
-
-        Vector3 predictedPosition = _target.transform.position;
-
+        float velocityMagnitude = _rb.velocity.magnitude;
+        _timeFromTarget = Mathf.Min(2f, Vector3.Distance(transform.position, _predictedTargetLocation) / velocityMagnitude);
+        
         if (_target.GetComponent<Rigidbody>() != null)
         {
             Vector3 acceleration = new Vector3();
@@ -230,15 +251,14 @@ public class MissileController : Aerodynamics
                 acceleration = (_target.GetComponent<Rigidbody>().velocity - _targetPreviousVelocity) / Time.fixedDeltaTime;
                 _targetPreviousVelocity = _target.GetComponent<Rigidbody>().velocity;
             }
-            for (int i = 0; i < _missileAccuracy; i++)
-            {
-                timeFromTarget = Mathf.Min(2f, Vector3.Distance(transform.position, predictedPosition) / velocityMagnitude);
-
-                predictedPosition = _target.transform.position + (timeFromTarget * _target.GetComponent<Rigidbody>().velocity) + (.5f * Mathf.Pow(timeFromTarget, 2) * acceleration);
-            }
+            _predictedTargetLocation = _target.transform.position + (_timeFromTarget * _target.GetComponent<Rigidbody>().velocity) + (.5f * Mathf.Pow(_timeFromTarget, 2) * acceleration);
+        }
+        else
+        {
+            _predictedTargetLocation = _target.transform.position;
         }
 
-        return predictedPosition;
+        return _predictedTargetLocation;
     }
 
     [ContextMenu("ActivateMissile")]
@@ -249,7 +269,7 @@ public class MissileController : Aerodynamics
 
     public void SetMissileActive(bool isActive)
     {
-        _activated = isActive;
+        Activated = isActive;
         RemoveFixedJoint();
         if (isActive && _launchAudio != null) _launchAudio.Play();
         GameObject currentObject = gameObject;
@@ -270,7 +290,7 @@ public class MissileController : Aerodynamics
 
     public void SetMissileActive(bool isActive, Vector3 withVelocity)
     {
-        _activated = isActive;
+        Activated = isActive;
         RemoveFixedJoint();
         if (isActive && _launchAudio != null) _launchAudio.Play();
         gameObject.transform.parent = null;
